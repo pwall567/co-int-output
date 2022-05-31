@@ -12,9 +12,9 @@
   <url>https://github.com/pwall567/co-int-output</url>
 
   <parent>
-    <groupId>io.kjson</groupId>
-    <artifactId>kjson-maven</artifactId>
-    <version>2.1</version>
+    <groupId>net.pwall.maven</groupId>
+    <artifactId>maven-kotlin</artifactId>
+    <version>4.0</version>
   </parent>
 
   <properties>
