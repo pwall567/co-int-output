@@ -36,8 +36,8 @@ import net.pwall.util.IntOutput.tensDigits
  * Non-blocking functions used in the conversion of integer values to string representations.  The functions all output
  * digits left-to-right, avoiding the need to allocate a separate object to hold the string representation.
  *
- * Each of the functions takes a `suspend` function as its last parameter; this will be used to perform the actual
- * output.
+ * Each of the functions comes in two forms &ndash; one that takes a `suspend` function as its last parameter, and an
+ * extension function on the `CoOutput` `typealias`.
  *
  * @author  Peter Wall
  */
@@ -46,13 +46,18 @@ object CoIntOutput {
     /**
      * Output an `Int` left-trimmed.
      */
-    suspend fun coOutputInt(i: Int, outFunction: suspend (Char) -> Unit) {
+    suspend fun coOutputInt(i: Int, out: CoOutput) = out.outputInt(i)
+
+    /**
+     * Output an `Int` left-trimmed.
+     */
+    suspend fun CoOutput.outputInt(i: Int) {
         when {
-            i >= 0 -> coOutputPositiveInt(i, outFunction)
-            i == Int.MIN_VALUE -> coOutputString(MIN_INTEGER_STRING, outFunction)
+            i >= 0 -> outputPositiveInt(i)
+            i == Int.MIN_VALUE -> output(MIN_INTEGER_STRING)
             else -> {
-                outFunction('-')
-                coOutputPositiveInt(-i, outFunction)
+                output('-')
+                outputPositiveInt(-i)
             }
         }
     }
@@ -60,41 +65,56 @@ object CoIntOutput {
     /**
      * Output a positive `Int` left-trimmed.
      */
-    suspend fun coOutputPositiveInt(i: Int, outFunction: suspend (Char) -> Unit) {
+    suspend fun coOutputPositiveInt(i: Int, out: CoOutput) = out.outputPositiveInt(i)
+
+    /**
+     * Output a positive `Int` left-trimmed.
+     */
+    suspend fun CoOutput.outputPositiveInt(i: Int) {
         when {
             i >= 100 -> {
                 val n = i / 100
-                coOutputPositiveInt(n, outFunction)
-                coOutput2Digits(i - n * 100, outFunction)
+                outputPositiveInt(n)
+                output2Digits(i - n * 100)
             }
-            i >= 10 -> coOutput2Digits(i, outFunction)
-            else -> outFunction(digits[i])
+            i >= 10 -> output2Digits(i)
+            else -> output(digits[i])
         }
     }
 
     /**
      * Output an unsigned `Int` left-trimmed.
      */
-    suspend fun coOutputUnsignedInt(i: Int, outFunction: suspend (Char) -> Unit) {
+    suspend fun coOutputUnsignedInt(i: Int, out: CoOutput) = out.outputUnsignedInt(i)
+
+    /**
+     * Output an unsigned `Int` left-trimmed.
+     */
+    suspend fun CoOutput.outputUnsignedInt(i: Int) {
         if (i >= 0)
-            coOutputPositiveInt(i, outFunction)
+            outputPositiveInt(i)
         else {
             val n = (i ushr 1) / 50
-            coOutputPositiveInt(n, outFunction)
-            coOutput2Digits(i - n * 100, outFunction)
+            outputPositiveInt(n)
+            output2Digits(i - n * 100)
         }
     }
 
     /**
      * Output a `Long` left-trimmed.
      */
-    suspend fun coOutputLong(n: Long, outFunction: suspend (Char) -> Unit) {
+    suspend fun coOutputLong(n: Long, out: CoOutput) = out.outputLong(n)
+
+    /**
+     * Output a `Long` left-trimmed.
+     */
+    suspend fun CoOutput.outputLong(n: Long) {
         when {
-            n >= 0 -> coOutputPositiveLong(n, outFunction)
-            n == Long.MIN_VALUE -> coOutputString(MIN_LONG_STRING, outFunction)
+            n >= 0 -> outputPositiveLong(n)
+            n == Long.MIN_VALUE -> output(MIN_LONG_STRING)
             else -> {
-                outFunction('-')
-                coOutputPositiveLong(-n, outFunction)
+                output('-')
+                outputPositiveLong(-n)
             }
         }
     }
@@ -102,66 +122,92 @@ object CoIntOutput {
     /**
      * Output a positive `Long` left-trimmed.
      */
-    suspend fun coOutputPositiveLong(n: Long, outFunction: suspend (Char) -> Unit) {
+    suspend fun coOutputPositiveLong(n: Long, out: CoOutput) = out.outputPositiveLong(n)
+
+    /**
+     * Output a positive `Long` left-trimmed.
+     */
+    suspend fun CoOutput.outputPositiveLong(n: Long) {
         when {
             n >= 100 -> {
                 val m = n / 100
-                coOutputPositiveLong(m, outFunction)
-                coOutput2Digits((n - m * 100).toInt(), outFunction)
+                outputPositiveLong(m)
+                output2Digits((n - m * 100).toInt())
             }
-            n >= 10 -> coOutput2Digits(n.toInt(), outFunction)
-            else -> outFunction(digits[n.toInt()])
+            n >= 10 -> output2Digits(n.toInt())
+            else -> output(digits[n.toInt()])
         }
     }
 
     /**
      * Output an unsigned `Long` left-trimmed.
      */
-    suspend fun coOutputUnsignedLong(n: Long, outFunction: suspend (Char) -> Unit) {
+    suspend fun coOutputUnsignedLong(n: Long, out: CoOutput) = out.outputUnsignedLong(n)
+
+    /**
+     * Output an unsigned `Long` left-trimmed.
+     */
+    suspend fun CoOutput.outputUnsignedLong(n: Long) {
         if (n >= 0)
-            coOutputPositiveLong(n, outFunction)
+            outputPositiveLong(n)
         else {
             val m = (n ushr 1) / 50
-            coOutputPositiveLong(m, outFunction)
-            coOutput2Digits((n - m * 100).toInt(), outFunction)
+            outputPositiveLong(m)
+            output2Digits((n - m * 100).toInt())
         }
     }
 
     /**
      * Output an `Int` as two decimal digits.
      */
-    suspend fun coOutput2Digits(i: Int, outFunction: suspend (Char) -> Unit) {
-        outFunction(tensDigits[i])
-        outFunction(digits[i])
+    suspend fun coOutput2Digits(i: Int, out: CoOutput) = out.output2Digits(i)
+
+    /**
+     * Output an `Int` as two decimal digits.
+     */
+    suspend fun CoOutput.output2Digits(i: Int) {
+        output(tensDigits[i])
+        output(digits[i])
     }
 
     /**
      * Output an `Int` as three decimal digits.
      */
-    suspend fun coOutput3Digits(i: Int, outFunction: suspend (Char) -> Unit) {
+    suspend fun coOutput3Digits(i: Int, out: CoOutput) = out.output3Digits(i)
+
+    /**
+     * Output an `Int` as three decimal digits.
+     */
+    suspend fun CoOutput.output3Digits(i: Int) {
         val n = i / 100
-        outFunction(digits[n])
-        coOutput2Digits(i - n * 100, outFunction)
+        output(digits[n])
+        output2Digits(i - n * 100)
     }
 
     /**
      * Output an `Int` left-trimmed with digits grouped in 3s, separated by a specified grouping character.
      */
-    suspend fun coOutputIntGrouped(i: Int, groupingChar: Char = ',', outFunction: suspend (Char) -> Unit) {
+    suspend fun coOutputIntGrouped(i: Int, groupingChar: Char = ',', out: CoOutput) =
+            out.outputIntGrouped(i, groupingChar)
+
+    /**
+     * Output an `Int` left-trimmed with digits grouped in 3s, separated by a specified grouping character.
+     */
+    suspend fun CoOutput.outputIntGrouped(i: Int, groupingChar: Char = ',') {
         when {
-            i >= 0 -> coOutputPositiveIntGrouped(i, groupingChar, outFunction)
+            i >= 0 -> outputPositiveIntGrouped(i, groupingChar)
             i == Int.MIN_VALUE -> {
-                coOutputString(MIN_INTEGER_STRING, 0, 2, outFunction)
-                outFunction(groupingChar)
-                coOutputString(MIN_INTEGER_STRING, 2, 5, outFunction)
-                outFunction(groupingChar)
-                coOutputString(MIN_INTEGER_STRING, 5, 8, outFunction)
-                outFunction(groupingChar)
-                coOutputString(MIN_INTEGER_STRING, 8, 11, outFunction)
+                output(MIN_INTEGER_STRING, 0, 2)
+                output(groupingChar)
+                output(MIN_INTEGER_STRING, 2, 5)
+                output(groupingChar)
+                output(MIN_INTEGER_STRING, 5, 8)
+                output(groupingChar)
+                output(MIN_INTEGER_STRING, 8, 11)
             }
             else -> {
-                outFunction('-')
-                coOutputPositiveIntGrouped(-i, groupingChar, outFunction)
+                output('-')
+                outputPositiveIntGrouped(-i, groupingChar)
             }
         }
     }
@@ -169,74 +215,86 @@ object CoIntOutput {
     /**
      * Output a positive `Int` left-trimmed with digits grouped in 3s, separated by a specified grouping character.
      */
-    suspend fun coOutputPositiveIntGrouped(i: Int, groupingChar: Char = ',', outFunction: suspend (Char) -> Unit) {
+    suspend fun coOutputPositiveIntGrouped(i: Int, groupingChar: Char = ',', out: CoOutput) =
+            out.outputPositiveIntGrouped(i, groupingChar)
+
+    /**
+     * Output a positive `Int` left-trimmed with digits grouped in 3s, separated by a specified grouping character.
+     */
+    suspend fun CoOutput.outputPositiveIntGrouped(i: Int, groupingChar: Char = ',') {
         when {
             i >= 100 -> {
                 val n = i / 100
-                coOutputPositiveIntGrouped1(n, groupingChar, outFunction)
-                coOutput2Digits(i - n * 100, outFunction)
+                outputPositiveIntGrouped1(n, groupingChar)
+                output2Digits(i - n * 100)
             }
-            i >= 10 -> coOutput2Digits(i, outFunction)
-            else -> outFunction(digits[i])
+            i >= 10 -> output2Digits(i)
+            else -> output(digits[i])
         }
     }
 
-    private suspend fun coOutputPositiveIntGrouped1(i: Int, groupingChar: Char, outFunction: suspend (Char) -> Unit) {
+    private suspend fun CoOutput.outputPositiveIntGrouped1(i: Int, groupingChar: Char) {
         when {
             i >= 100 -> {
                 val n = i / 100
-                coOutputPositiveIntGrouped2(n, groupingChar, outFunction)
+                outputPositiveIntGrouped2(n, groupingChar)
                 val m = i - n * 100
-                outFunction(tensDigits[m])
-                outFunction(groupingChar)
-                outFunction(digits[m])
+                output(tensDigits[m])
+                output(groupingChar)
+                output(digits[m])
             }
             i >= 10 -> {
-                outFunction(tensDigits[i])
-                outFunction(groupingChar)
-                outFunction(digits[i])
+                output(tensDigits[i])
+                output(groupingChar)
+                output(digits[i])
             }
-            else -> outFunction(digits[i])
+            else -> output(digits[i])
         }
     }
 
-    private suspend fun coOutputPositiveIntGrouped2(i: Int, groupingChar: Char, outFunction: suspend (Char) -> Unit) {
+    private suspend fun CoOutput.outputPositiveIntGrouped2(i: Int, groupingChar: Char) {
         when {
             i >= 100 -> {
                 val n = i / 100
-                coOutputPositiveIntGrouped(n, groupingChar, outFunction)
-                outFunction(groupingChar)
-                coOutput2Digits(i - n * 100, outFunction)
+                outputPositiveIntGrouped(n, groupingChar)
+                output(groupingChar)
+                output2Digits(i - n * 100)
             }
-            i >= 10 -> coOutput2Digits(i, outFunction)
-            else -> outFunction(digits[i])
+            i >= 10 -> output2Digits(i)
+            else -> output(digits[i])
         }
     }
 
     /**
      * Output a `Long` left-trimmed with digits grouped in 3s, separated by a specified grouping character.
      */
-    suspend fun coOutputLongGrouped(n: Long, groupingChar: Char = ',', outFunction: suspend (Char) -> Unit) {
+    suspend fun coOutputLongGrouped(n: Long, groupingChar: Char = ',', out: CoOutput) =
+            out.outputLongGrouped(n, groupingChar)
+
+    /**
+     * Output a `Long` left-trimmed with digits grouped in 3s, separated by a specified grouping character.
+     */
+    suspend fun CoOutput.outputLongGrouped(n: Long, groupingChar: Char = ',') {
         when {
-            n >= 0 -> coOutputPositiveLongGrouped(n, groupingChar, outFunction)
+            n >= 0 -> outputPositiveLongGrouped(n, groupingChar)
             n == Long.MIN_VALUE -> {
-                coOutputString(MIN_LONG_STRING, 0, 2, outFunction)
-                outFunction(groupingChar)
-                coOutputString(MIN_LONG_STRING, 2, 5, outFunction)
-                outFunction(groupingChar)
-                coOutputString(MIN_LONG_STRING, 5, 8, outFunction)
-                outFunction(groupingChar)
-                coOutputString(MIN_LONG_STRING, 8, 11, outFunction)
-                outFunction(groupingChar)
-                coOutputString(MIN_LONG_STRING, 11, 14, outFunction)
-                outFunction(groupingChar)
-                coOutputString(MIN_LONG_STRING, 14, 17, outFunction)
-                outFunction(groupingChar)
-                coOutputString(MIN_LONG_STRING, 17, 20, outFunction)
+                output(MIN_LONG_STRING, 0, 2)
+                output(groupingChar)
+                output(MIN_LONG_STRING, 2, 5)
+                output(groupingChar)
+                output(MIN_LONG_STRING, 5, 8)
+                output(groupingChar)
+                output(MIN_LONG_STRING, 8, 11)
+                output(groupingChar)
+                output(MIN_LONG_STRING, 11, 14)
+                output(groupingChar)
+                output(MIN_LONG_STRING, 14, 17)
+                output(groupingChar)
+                output(MIN_LONG_STRING, 17, 20)
             }
             else -> {
-                outFunction('-')
-                coOutputPositiveLongGrouped(-n, groupingChar, outFunction)
+                output('-')
+                outputPositiveLongGrouped(-n, groupingChar)
             }
         }
     }
@@ -244,201 +302,258 @@ object CoIntOutput {
     /**
      * Output a positive `Long` left-trimmed with digits grouped in 3s, separated by a specified grouping character.
      */
-    suspend fun coOutputPositiveLongGrouped(n: Long, groupingChar: Char = ',', outFunction: suspend (Char) -> Unit) {
+    suspend fun coOutputPositiveLongGrouped(n: Long, groupingChar: Char = ',', out: CoOutput) =
+            out.outputPositiveLongGrouped(n, groupingChar)
+
+    /**
+     * Output a positive `Long` left-trimmed with digits grouped in 3s, separated by a specified grouping character.
+     */
+    suspend fun CoOutput.outputPositiveLongGrouped(n: Long, groupingChar: Char = ',') {
         when {
             n >= 100 -> {
                 val m = n / 100
-                coOutputPositiveLongGrouped1(m, groupingChar, outFunction)
-                coOutput2Digits((n - m * 100).toInt(), outFunction)
+                outputPositiveLongGrouped1(m, groupingChar)
+                output2Digits((n - m * 100).toInt())
             }
-            n >= 10 -> coOutput2Digits(n.toInt(), outFunction)
-            else -> outFunction(digits[n.toInt()])
+            n >= 10 -> output2Digits(n.toInt())
+            else -> output(digits[n.toInt()])
         }
     }
 
-    private suspend fun coOutputPositiveLongGrouped1(n: Long, groupingChar: Char, outFunction: suspend (Char) -> Unit) {
+    private suspend fun CoOutput.outputPositiveLongGrouped1(n: Long, groupingChar: Char) {
         when {
             n >= 100 -> {
                 val m = n / 100
-                coOutputPositiveLongGrouped2(m, groupingChar, outFunction)
+                outputPositiveLongGrouped2(m, groupingChar)
                 val k = (n - m * 100).toInt()
-                outFunction(tensDigits[k])
-                outFunction(groupingChar)
-                outFunction(digits[k])
+                output(tensDigits[k])
+                output(groupingChar)
+                output(digits[k])
             }
             n >= 10 -> {
-                outFunction(tensDigits[n.toInt()])
-                outFunction(groupingChar)
-                outFunction(digits[n.toInt()])
+                output(tensDigits[n.toInt()])
+                output(groupingChar)
+                output(digits[n.toInt()])
             }
-            else -> outFunction(digits[n.toInt()])
+            else -> output(digits[n.toInt()])
         }
     }
 
-    private suspend fun coOutputPositiveLongGrouped2(n: Long, groupingChar: Char, outFunction: suspend (Char) -> Unit) {
+    private suspend fun CoOutput.outputPositiveLongGrouped2(n: Long, groupingChar: Char) {
         when {
             n >= 100 -> {
                 val m = n / 100
-                coOutputPositiveLongGrouped(m, groupingChar, outFunction)
-                outFunction(groupingChar)
-                coOutput2Digits((n - m * 100).toInt(), outFunction)
+                outputPositiveLongGrouped(m, groupingChar)
+                output(groupingChar)
+                output2Digits((n - m * 100).toInt())
             }
-            n >= 10 -> coOutput2Digits(n.toInt(), outFunction)
-            else -> outFunction(digits[n.toInt()])
+            n >= 10 -> output2Digits(n.toInt())
+            else -> output(digits[n.toInt()])
         }
     }
 
     /**
      * Output an `Int` left-trimmed in hexadecimal.
      */
-    suspend fun coOutputIntHex(i: Int, outFunction: suspend (Char) -> Unit) {
+    suspend fun coOutputIntHex(i: Int, out: CoOutput) = out.outputIntHex(i)
+
+    /**
+     * Output an `Int` left-trimmed in hexadecimal.
+     */
+    suspend fun CoOutput.outputIntHex(i: Int) {
         if ((i and 0xFFFF.inv()) != 0) {
-            coOutput16BitsHex(i ushr 16, outFunction)
-            coOutput4Hex(i, outFunction)
+            output16BitsHex(i ushr 16)
+            output4Hex(i)
         }
         else
-            coOutput16BitsHex(i, outFunction)
+            output16BitsHex(i)
     }
 
-    private suspend fun coOutput8BitsHex(i: Int, outFunction: suspend (Char) -> Unit) {
+    private suspend fun CoOutput.output8BitsHex(i: Int) {
         if ((i and 0xF.inv()) != 0)
-            outFunction(digitsHex[i ushr 4])
-        outFunction(digitsHex[i and 0xF])
+            output(digitsHex[i ushr 4])
+        output(digitsHex[i and 0xF])
     }
 
-    private suspend fun coOutput16BitsHex(i: Int, outFunction: suspend (Char) -> Unit) {
+    private suspend fun CoOutput.output16BitsHex(i: Int) {
         if ((i and 0xFF.inv()) != 0) {
-            coOutput8BitsHex(i ushr 8, outFunction)
-            coOutput2Hex(i, outFunction)
+            output8BitsHex(i ushr 8)
+            output2Hex(i)
         }
         else
-            coOutput8BitsHex(i, outFunction)
+            output8BitsHex(i)
     }
 
     /**
      * Output an `Int` left-trimmed in hexadecimal, using lower-case for the alphabetic characters.
      */
-    suspend fun coOutputIntHexLC(i: Int, outFunction: suspend (Char) -> Unit) {
+    suspend fun coOutputIntHexLC(i: Int, out: CoOutput) = out.outputIntHexLC(i)
+
+    /**
+     * Output an `Int` left-trimmed in hexadecimal, using lower-case for the alphabetic characters.
+     */
+    suspend fun CoOutput.outputIntHexLC(i: Int) {
         if ((i and 0xFFFF.inv()) != 0) {
-            coOutput16BitsHexLC(i ushr 16, outFunction)
-            coOutput4HexLC(i, outFunction)
+            output16BitsHexLC(i ushr 16)
+            output4HexLC(i)
         }
         else
-            coOutput16BitsHexLC(i, outFunction)
+            output16BitsHexLC(i)
     }
 
-    private suspend fun coOutput8BitsHexLC(i: Int, outFunction: suspend (Char) -> Unit) {
+    private suspend fun CoOutput.output8BitsHexLC(i: Int) {
         if ((i and 0xF.inv()) != 0)
-            outFunction(digitsHexLC[i ushr 4])
-        outFunction(digitsHexLC[i and 0xF])
+            output(digitsHexLC[i ushr 4])
+        output(digitsHexLC[i and 0xF])
     }
 
-    private suspend fun coOutput16BitsHexLC(i: Int, outFunction: suspend (Char) -> Unit) {
+    private suspend fun CoOutput.output16BitsHexLC(i: Int) {
         if ((i and 0xFF.inv()) != 0) {
-            coOutput8BitsHexLC(i ushr 8, outFunction)
-            coOutput2HexLC(i, outFunction)
+            output8BitsHexLC(i ushr 8)
+            output2HexLC(i)
         }
         else
-            coOutput8BitsHexLC(i, outFunction)
+            output8BitsHexLC(i)
     }
 
     /**
      * Output a `Long` left-trimmed in hexadecimal.
      */
-    suspend fun coOutputLongHex(n: Long, outFunction: suspend (Char) -> Unit) {
+    suspend fun coOutputLongHex(n: Long, out: CoOutput) = out.outputLongHex(n)
+
+    /**
+     * Output a `Long` left-trimmed in hexadecimal.
+     */
+    suspend fun CoOutput.outputLongHex(n: Long) {
         val hi = (n ushr 32).toInt()
         val lo = n.toInt()
         if (hi != 0) {
-            coOutputIntHex(hi, outFunction)
-            coOutput8Hex(lo, outFunction)
+            outputIntHex(hi)
+            output8Hex(lo)
         }
         else
-            coOutputIntHex(lo, outFunction)
+            outputIntHex(lo)
     }
 
     /**
      * Output a `Long` left-trimmed in hexadecimal, using lower-case for the alphabetic characters.
      */
-    suspend fun coOutputLongHexLC(n: Long, outFunction: suspend (Char) -> Unit) {
+    suspend fun coOutputLongHexLC(n: Long, out: CoOutput) = out.outputLongHexLC(n)
+
+    /**
+     * Output a `Long` left-trimmed in hexadecimal, using lower-case for the alphabetic characters.
+     */
+    suspend fun CoOutput.outputLongHexLC(n: Long) {
         val hi = (n ushr 32).toInt()
         val lo = n.toInt()
         if (hi != 0) {
-            coOutputIntHexLC(hi, outFunction)
-            coOutput8HexLC(lo, outFunction)
+            outputIntHexLC(hi)
+            output8HexLC(lo)
         }
         else
-            coOutputIntHexLC(lo, outFunction)
+            outputIntHexLC(lo)
     }
 
     /**
      * Output an `Int` as eight hexadecimal digits.
      */
-    suspend fun coOutput8Hex(i: Int, outFunction: suspend (Char) -> Unit) {
-        coOutput4Hex(i ushr 16, outFunction)
-        coOutput4Hex(i, outFunction)
+    suspend fun coOutput8Hex(i: Int, out: CoOutput) = out.output8Hex(i)
+
+    /**
+     * Output an `Int` as eight hexadecimal digits.
+     */
+    suspend fun CoOutput.output8Hex(i: Int) {
+        output4Hex(i ushr 16)
+        output4Hex(i)
     }
 
     /**
      * Output an `Int` as eight hexadecimal digits, using lower-case for the alphabetic characters.
      */
-    suspend fun coOutput8HexLC(i: Int, outFunction: suspend (Char) -> Unit) {
-        coOutput4HexLC(i ushr 16, outFunction)
-        coOutput4HexLC(i, outFunction)
+    suspend fun coOutput8HexLC(i: Int, out: CoOutput) = out.output8HexLC(i)
+
+    /**
+     * Output an `Int` as eight hexadecimal digits, using lower-case for the alphabetic characters.
+     */
+    suspend fun CoOutput.output8HexLC(i: Int) {
+        output4HexLC(i ushr 16)
+        output4HexLC(i)
     }
 
     /**
      * Output an `Int` as four hexadecimal digits.
      */
-    suspend fun coOutput4Hex(i: Int, outFunction: suspend (Char) -> Unit) {
-        coOutput2Hex(i ushr 8, outFunction)
-        coOutput2Hex(i, outFunction)
+    suspend fun coOutput4Hex(i: Int, out: CoOutput) = out.output4Hex(i)
+
+    /**
+     * Output an `Int` as four hexadecimal digits.
+     */
+    suspend fun CoOutput.output4Hex(i: Int) {
+        output2Hex(i ushr 8)
+        output2Hex(i)
     }
 
     /**
      * Output an `Int` as four hexadecimal digits, using lower-case for the alphabetic characters.
      */
-    suspend fun coOutput4HexLC(i: Int, outFunction: suspend (Char) -> Unit) {
-        coOutput2HexLC(i ushr 8, outFunction)
-        coOutput2HexLC(i, outFunction)
+    suspend fun coOutput4HexLC(i: Int, out: CoOutput) = out.output4HexLC(i)
+
+    /**
+     * Output an `Int` as four hexadecimal digits, using lower-case for the alphabetic characters.
+     */
+    suspend fun CoOutput.output4HexLC(i: Int) {
+        output2HexLC(i ushr 8)
+        output2HexLC(i)
     }
 
     /**
      * Output an `Int` as two hexadecimal digits.
      */
-    suspend fun coOutput2Hex(i: Int, outFunction: suspend (Char) -> Unit) {
-        outFunction(digitsHex[(i shr 4) and 0xF])
-        outFunction(digitsHex[i and 0xF])
+    suspend fun coOutput2Hex(i: Int, out: CoOutput) = out.output2Hex(i)
+
+    /**
+     * Output an `Int` as two hexadecimal digits.
+     */
+    suspend fun CoOutput.output2Hex(i: Int) {
+        output(digitsHex[(i shr 4) and 0xF])
+        output(digitsHex[i and 0xF])
     }
 
     /**
      * Output an `Int` as two hexadecimal digits, using lower-case for the alphabetic characters.
      */
-    suspend fun coOutput2HexLC(i: Int, outFunction: suspend (Char) -> Unit) {
-        outFunction(digitsHexLC[(i shr 4) and 0xF])
-        outFunction(digitsHexLC[i and 0xF])
+    suspend fun coOutput2HexLC(i: Int, out: CoOutput) = out.output2HexLC(i)
+
+    /**
+     * Output an `Int` as two hexadecimal digits, using lower-case for the alphabetic characters.
+     */
+    suspend fun CoOutput.output2HexLC(i: Int) {
+        output(digitsHexLC[(i shr 4) and 0xF])
+        output(digitsHexLC[i and 0xF])
     }
 
     /**
      * Output an `Int` as a single hexadecimal digit.
      */
-    suspend fun coOutput1Hex(i: Int, outFunction: suspend (Char) -> Unit) {
-        outFunction(digitsHex[i and 0xF])
+    suspend fun coOutput1Hex(i: Int, out: CoOutput) = out.output1Hex(i)
+
+    /**
+     * Output an `Int` as a single hexadecimal digit.
+     */
+    suspend fun CoOutput.output1Hex(i: Int) {
+        output(digitsHex[i and 0xF])
     }
 
     /**
      * Output an `Int` as a single hexadecimal digit, using lower-case for the alphabetic characters.
      */
-    suspend fun coOutput1HexLC(i: Int, outFunction: suspend (Char) -> Unit) {
-        outFunction(digitsHexLC[i and 0xF])
-    }
+    suspend fun coOutput1HexLC(i: Int, out: CoOutput) = out.output1HexLC(i)
 
-    private suspend fun coOutputString(s: String, start: Int, end: Int, outFunction: suspend (Char) -> Unit) {
-        for (i in start until end)
-            outFunction(s[i])
-    }
-
-    private suspend fun coOutputString(s: String, outFunction: suspend (Char) -> Unit) {
-        coOutputString(s, 0, s.length, outFunction)
+    /**
+     * Output an `Int` as a single hexadecimal digit, using lower-case for the alphabetic characters.
+     */
+    suspend fun CoOutput.output1HexLC(i: Int) {
+        output(digitsHexLC[i and 0xF])
     }
 
 }

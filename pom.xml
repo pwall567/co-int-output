@@ -5,7 +5,7 @@
 
   <groupId>net.pwall.util</groupId>
   <artifactId>co-int-output</artifactId>
-  <version>1.0</version>
+  <version>2.0</version>
   <name>Non-blocking integer output functions</name>
   <description>Non-blocking versions of integer output functions</description>
   <packaging>jar</packaging>

@@ -28,6 +28,7 @@ package net.pwall.util
 import kotlin.test.Test
 import kotlin.test.expect
 import kotlinx.coroutines.runBlocking
+
 import net.pwall.util.CoIntOutput.coOutput1Hex
 import net.pwall.util.CoIntOutput.coOutput1HexLC
 import net.pwall.util.CoIntOutput.coOutput2Digits
@@ -52,10 +53,34 @@ import net.pwall.util.CoIntOutput.coOutputPositiveLong
 import net.pwall.util.CoIntOutput.coOutputPositiveLongGrouped
 import net.pwall.util.CoIntOutput.coOutputUnsignedInt
 import net.pwall.util.CoIntOutput.coOutputUnsignedLong
+import net.pwall.util.CoIntOutput.output1Hex
+import net.pwall.util.CoIntOutput.output1HexLC
+import net.pwall.util.CoIntOutput.output2Digits
+import net.pwall.util.CoIntOutput.output2Hex
+import net.pwall.util.CoIntOutput.output2HexLC
+import net.pwall.util.CoIntOutput.output3Digits
+import net.pwall.util.CoIntOutput.output4Hex
+import net.pwall.util.CoIntOutput.output4HexLC
+import net.pwall.util.CoIntOutput.output8Hex
+import net.pwall.util.CoIntOutput.output8HexLC
+import net.pwall.util.CoIntOutput.outputInt
+import net.pwall.util.CoIntOutput.outputIntGrouped
+import net.pwall.util.CoIntOutput.outputIntHex
+import net.pwall.util.CoIntOutput.outputIntHexLC
+import net.pwall.util.CoIntOutput.outputLong
+import net.pwall.util.CoIntOutput.outputLongGrouped
+import net.pwall.util.CoIntOutput.outputLongHex
+import net.pwall.util.CoIntOutput.outputLongHexLC
+import net.pwall.util.CoIntOutput.outputPositiveInt
+import net.pwall.util.CoIntOutput.outputPositiveIntGrouped
+import net.pwall.util.CoIntOutput.outputPositiveLong
+import net.pwall.util.CoIntOutput.outputPositiveLongGrouped
+import net.pwall.util.CoIntOutput.outputUnsignedInt
+import net.pwall.util.CoIntOutput.outputUnsignedLong
 
 class CoIntOutputTest {
 
-    @Test fun `should convert int correctly`() = runBlocking {
+    @Test fun `should convert int correctly using lambda`() = runBlocking {
         expect("0") { coOutputIntString(0) }
         expect("123456") { coOutputIntString(123456) }
         expect("-22334455") { coOutputIntString(-22334455) }
@@ -66,11 +91,22 @@ class CoIntOutputTest {
     private suspend fun coOutputIntString(n: Int): String {
         val charArray = CharArray(16)
         var i = 0
-        coOutputInt(n) { charArray[i++] = it }
+        val out: CoOutput = { charArray[i++] = it }
+        coOutputInt(n, out)
         return String(charArray, 0, i)
     }
 
-    @Test fun `should convert positive int correctly`() = runBlocking {
+    @Test fun `should convert int correctly using extension function`() = runBlocking {
+        expect("0") { outputIntString(0) }
+        expect("123456") { outputIntString(123456) }
+        expect("-22334455") { outputIntString(-22334455) }
+        expect("2147483647") { outputIntString(Int.MAX_VALUE) }
+        expect("-2147483648") { outputIntString(Int.MIN_VALUE) }
+    }
+
+    private suspend fun outputIntString(n: Int) = CoCapture().apply { outputInt(n) }.toString()
+
+    @Test fun `should convert positive int correctly using lambda`() = runBlocking {
         expect("0") { coOutputPositiveIntString(0) }
         expect("123456") { coOutputPositiveIntString(123456) }
         expect("2147483647") { coOutputPositiveIntString(Int.MAX_VALUE) }
@@ -83,7 +119,15 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should convert unsigned int correctly`() = runBlocking {
+    @Test fun `should convert positive int correctly using extension function`() = runBlocking {
+        expect("0") { outputPositiveIntString(0) }
+        expect("123456") { outputPositiveIntString(123456) }
+        expect("2147483647") { outputPositiveIntString(Int.MAX_VALUE) }
+    }
+
+    private suspend fun outputPositiveIntString(n: Int) = CoCapture().apply { outputPositiveInt(n) }.toString()
+
+    @Test fun `should convert unsigned int correctly using lambda`() = runBlocking {
         expect("0") { coOutputUnsignedIntString(0) }
         expect("123456") { coOutputUnsignedIntString(123456) }
         expect("2147483648") { coOutputUnsignedIntString(2147483648.toInt()) }
@@ -98,7 +142,17 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should convert long correctly`() = runBlocking {
+    @Test fun `should convert unsigned int correctly using extension function`() = runBlocking {
+        expect("0") { outputUnsignedIntString(0) }
+        expect("123456") { outputUnsignedIntString(123456) }
+        expect("2147483648") { outputUnsignedIntString(2147483648.toInt()) }
+        expect("3456789012") { outputUnsignedIntString(3456789012.toInt()) }
+        expect("2309737967") { outputUnsignedIntString(0x89ABCDEF.toInt()) }
+    }
+
+    private suspend fun outputUnsignedIntString(n: Int) = CoCapture().apply { outputUnsignedInt(n) }.toString()
+
+    @Test fun `should convert long correctly using lambda`() = runBlocking {
         expect("0") { coOutputLongString(0) }
         expect("123456789012345678") { coOutputLongString(123456789012345678) }
         expect("-2233445566778899") { coOutputLongString(-2233445566778899) }
@@ -115,7 +169,19 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should convert positive long correctly`() = runBlocking {
+    @Test fun `should convert long correctly using extension function`() = runBlocking {
+        expect("0") { outputLongString(0) }
+        expect("123456789012345678") { outputLongString(123456789012345678) }
+        expect("-2233445566778899") { outputLongString(-2233445566778899) }
+        expect("2147483647") { outputLongString(Int.MAX_VALUE.toLong()) }
+        expect("-2147483648") { outputLongString(Int.MIN_VALUE.toLong()) }
+        expect("9223372036854775807") { outputLongString(Long.MAX_VALUE) }
+        expect("-9223372036854775808") { outputLongString(Long.MIN_VALUE) }
+    }
+
+    private suspend fun outputLongString(n: Long) = CoCapture().apply { outputLong(n) }.toString()
+
+    @Test fun `should convert positive long correctly using lambda`() = runBlocking {
         expect("0") { coOutputPositiveLongString(0) }
         expect("123456789012345678") { coOutputPositiveLongString(123456789012345678) }
         expect("2147483647") { coOutputPositiveLongString(Int.MAX_VALUE.toLong()) }
@@ -129,7 +195,16 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should convert unsigned long correctly`() = runBlocking {
+    @Test fun `should convert positive long correctly using extension function`() = runBlocking {
+        expect("0") { outputPositiveLongString(0) }
+        expect("123456789012345678") { outputPositiveLongString(123456789012345678) }
+        expect("2147483647") { outputPositiveLongString(Int.MAX_VALUE.toLong()) }
+        expect("9223372036854775807") { outputPositiveLongString(Long.MAX_VALUE) }
+    }
+
+    private suspend fun outputPositiveLongString(n: Long) = CoCapture().apply { outputPositiveLong(n) }.toString()
+
+    @Test fun `should convert unsigned long correctly using lambda`() = runBlocking {
         expect("0") { coOutputUnsignedLongString(0) }
         expect("1234567890123456789") { coOutputUnsignedLongString(1234567890123456789) }
         expect("9223372036854775808") { coOutputUnsignedLongString(maxValue() + 1) }
@@ -143,7 +218,16 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should output 2 digits correctly`() = runBlocking {
+    @Test fun `should convert unsigned long correctly using extension function`() = runBlocking {
+        expect("0") { outputUnsignedLongString(0) }
+        expect("1234567890123456789") { outputUnsignedLongString(1234567890123456789) }
+        expect("9223372036854775808") { outputUnsignedLongString(maxValue() + 1) }
+        expect("12345678901234567890") { outputUnsignedLongString(nineteenDigits() * 10) }
+    }
+
+    private suspend fun outputUnsignedLongString(n: Long) = CoCapture().apply { outputUnsignedLong(n) }.toString()
+
+    @Test fun `should output 2 digits correctly using lambda`() = runBlocking {
         expect("00") { coOutput2DigitsString(0) }
         expect("01") { coOutput2DigitsString(1) }
         expect("21") { coOutput2DigitsString(21) }
@@ -156,7 +240,15 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should output 3 digits correctly`() = runBlocking {
+    @Test fun `should output 2 digits correctly using extension function`() = runBlocking {
+        expect("00") { output2DigitsString(0) }
+        expect("01") { output2DigitsString(1) }
+        expect("21") { output2DigitsString(21) }
+    }
+
+    private suspend fun output2DigitsString(n: Int) = CoCapture().apply { output2Digits(n) }.toString()
+
+    @Test fun `should output 3 digits correctly using lambda`() = runBlocking {
         expect("000") { coOutput3DigitsString(0) }
         expect("001") { coOutput3DigitsString(1) }
         expect("021") { coOutput3DigitsString(21) }
@@ -170,7 +262,16 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should output integer using grouping`() = runBlocking {
+    @Test fun `should output 3 digits correctly using extension function`() = runBlocking {
+        expect("000") { output3DigitsString(0) }
+        expect("001") { output3DigitsString(1) }
+        expect("021") { output3DigitsString(21) }
+        expect("321") { output3DigitsString(321) }
+    }
+
+    private suspend fun output3DigitsString(n: Int) = CoCapture().apply { output3Digits(n) }.toString()
+
+    @Test fun `should output integer with grouping using lambda`() = runBlocking {
         expect("0") { coOutputIntGroupedString(0) }
         expect("1") { coOutputIntGroupedString(1) }
         expect("12") { coOutputIntGroupedString(12) }
@@ -203,7 +304,36 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should output positive integer using grouping`() = runBlocking {
+    @Test fun `should output integer with grouping using extension function`() = runBlocking {
+        expect("0") { outputIntGroupedString(0) }
+        expect("1") { outputIntGroupedString(1) }
+        expect("12") { outputIntGroupedString(12) }
+        expect("123") { outputIntGroupedString(123) }
+        expect("1,234") { outputIntGroupedString(1234) }
+        expect("12,345") { outputIntGroupedString(12345) }
+        expect("123,456") { outputIntGroupedString(123456) }
+        expect("1,234,567") { outputIntGroupedString(1234567) }
+        expect("12,345,678") { outputIntGroupedString(12345678) }
+        expect("123,456,789") { outputIntGroupedString(123456789) }
+        expect("1,234,567,890") { outputIntGroupedString(1234567890) }
+        expect("2 147 483 647") { outputIntGroupedString(Int.MAX_VALUE, ' ') }
+        expect("-2 147 483 648") { outputIntGroupedString(Int.MIN_VALUE, ' ') }
+        expect("-1") { outputIntGroupedString(-1) }
+        expect("-12") { outputIntGroupedString(-12) }
+        expect("-123") { outputIntGroupedString(-123) }
+        expect("-1,234") { outputIntGroupedString(-1234) }
+        expect("-12,345") { outputIntGroupedString(-12345) }
+        expect("-123,456") { outputIntGroupedString(-123456) }
+        expect("-1,234,567") { outputIntGroupedString(-1234567) }
+        expect("-12,345,678") { outputIntGroupedString(-12345678) }
+        expect("-123,456,789") { outputIntGroupedString(-123456789) }
+        expect("-1,234,567,890") { outputIntGroupedString(-1234567890) }
+    }
+
+    private suspend fun outputIntGroupedString(n: Int, groupingChar: Char = ',') =
+            CoCapture().apply { outputIntGrouped(n, groupingChar) }.toString()
+
+    @Test fun `should output positive integer with grouping using lambda`() = runBlocking {
         expect("0") { coOutputPositiveIntGroupedString(0) }
         expect("1") { coOutputPositiveIntGroupedString(1) }
         expect("12") { coOutputPositiveIntGroupedString(12) }
@@ -225,7 +355,25 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should output long using grouping`() = runBlocking {
+    @Test fun `should output positive integer with grouping using extension function`() = runBlocking {
+        expect("0") { outputPositiveIntGroupedString(0) }
+        expect("1") { outputPositiveIntGroupedString(1) }
+        expect("12") { outputPositiveIntGroupedString(12) }
+        expect("123") { outputPositiveIntGroupedString(123) }
+        expect("1,234") { outputPositiveIntGroupedString(1234) }
+        expect("12,345") { outputPositiveIntGroupedString(12345) }
+        expect("123,456") { outputPositiveIntGroupedString(123456) }
+        expect("1,234,567") { outputPositiveIntGroupedString(1234567) }
+        expect("12,345,678") { outputPositiveIntGroupedString(12345678) }
+        expect("123,456,789") { outputPositiveIntGroupedString(123456789) }
+        expect("1,234,567,890") { outputPositiveIntGroupedString(1234567890) }
+        expect("2 147 483 647") { outputPositiveIntGroupedString(Int.MAX_VALUE, ' ') }
+    }
+
+    private suspend fun outputPositiveIntGroupedString(n: Int, groupingChar: Char = ',') =
+        CoCapture().apply { outputPositiveIntGrouped(n, groupingChar) }.toString()
+
+    @Test fun `should output long with grouping using lambda`() = runBlocking {
         expect("0") { coOutputLongGroupedString(0) }
         expect("1") { coOutputLongGroupedString(1) }
         expect("12") { coOutputLongGroupedString(12) }
@@ -278,7 +426,56 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should output positive long using grouping`() = runBlocking {
+    @Test fun `should output long with grouping using extension function`() = runBlocking {
+        expect("0") { outputLongGroupedString(0) }
+        expect("1") { outputLongGroupedString(1) }
+        expect("12") { outputLongGroupedString(12) }
+        expect("123") { outputLongGroupedString(123) }
+        expect("1,234") { outputLongGroupedString(1234) }
+        expect("12,345") { outputLongGroupedString(12345) }
+        expect("123,456") { outputLongGroupedString(123456) }
+        expect("1,234,567") { outputLongGroupedString(1234567) }
+        expect("12,345,678") { outputLongGroupedString(12345678) }
+        expect("123,456,789") { outputLongGroupedString(123456789) }
+        expect("1,234,567,890") { outputLongGroupedString(1234567890) }
+        expect("12,345,678,901") { outputLongGroupedString(12345678901) }
+        expect("123,456,789,012") { outputLongGroupedString(123456789012) }
+        expect("1,234,567,890,123") { outputLongGroupedString(1234567890123) }
+        expect("12,345,678,901,234") { outputLongGroupedString(12345678901234) }
+        expect("123,456,789,012,345") { outputLongGroupedString(123456789012345) }
+        expect("1,234,567,890,123,456") { outputLongGroupedString(1234567890123456) }
+        expect("12,345,678,901,234,567") { outputLongGroupedString(12345678901234567) }
+        expect("123,456,789,012,345,678") { outputLongGroupedString(123456789012345678) }
+        expect("1,234,567,890,123,456,789") { outputLongGroupedString(1234567890123456789) }
+        expect("2 147 483 647") { outputLongGroupedString(Int.MAX_VALUE.toLong(), ' ') }
+        expect("-2 147 483 648") { outputLongGroupedString(Int.MIN_VALUE.toLong(), ' ') }
+        expect("9_223_372_036_854_775_807") { outputLongGroupedString(Long.MAX_VALUE, '_') }
+        expect("-9,223,372,036,854,775,808") { outputLongGroupedString(Long.MIN_VALUE) }
+        expect("-1") { outputLongGroupedString(-1) }
+        expect("-12") { outputLongGroupedString(-12) }
+        expect("-123") { outputLongGroupedString(-123) }
+        expect("-1,234") { outputLongGroupedString(-1234) }
+        expect("-12,345") { outputLongGroupedString(-12345) }
+        expect("-123,456") { outputLongGroupedString(-123456) }
+        expect("-1,234,567") { outputLongGroupedString(-1234567) }
+        expect("-12,345,678") { outputLongGroupedString(-12345678) }
+        expect("-123,456,789") { outputLongGroupedString(-123456789) }
+        expect("-1,234,567,890") { outputLongGroupedString(-1234567890) }
+        expect("-12,345,678,901") { outputLongGroupedString(-12345678901) }
+        expect("-123,456,789,012") { outputLongGroupedString(-123456789012) }
+        expect("-1,234,567,890,123") { outputLongGroupedString(-1234567890123) }
+        expect("-12,345,678,901,234") { outputLongGroupedString(-12345678901234) }
+        expect("-123,456,789,012,345") { outputLongGroupedString(-123456789012345) }
+        expect("-1,234,567,890,123,456") { outputLongGroupedString(-1234567890123456) }
+        expect("-12,345,678,901,234,567") { outputLongGroupedString(-12345678901234567) }
+        expect("-123,456,789,012,345,678") { outputLongGroupedString(-123456789012345678) }
+        expect("-1,234,567,890,123,456,789") { outputLongGroupedString(-1234567890123456789) }
+    }
+
+    private suspend fun outputLongGroupedString(n: Long, groupingChar: Char = ',') =
+        CoCapture().apply { outputLongGrouped(n, groupingChar) }.toString()
+
+    @Test fun `should output positive long with grouping using lambda`() = runBlocking {
         expect("0") { coOutputPositiveLongGroupedString(0) }
         expect("1") { coOutputPositiveLongGroupedString(1) }
         expect("12") { coOutputPositiveLongGroupedString(12) }
@@ -310,7 +507,35 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should convert int to hex correctly`() = runBlocking {
+    @Test fun `should output positive long with grouping using extension function`() = runBlocking {
+        expect("0") { outputPositiveLongGroupedString(0) }
+        expect("1") { outputPositiveLongGroupedString(1) }
+        expect("12") { outputPositiveLongGroupedString(12) }
+        expect("123") { outputPositiveLongGroupedString(123) }
+        expect("1,234") { outputPositiveLongGroupedString(1234) }
+        expect("12,345") { outputPositiveLongGroupedString(12345) }
+        expect("123,456") { outputPositiveLongGroupedString(123456) }
+        expect("1,234,567") { outputPositiveLongGroupedString(1234567) }
+        expect("12,345,678") { outputPositiveLongGroupedString(12345678) }
+        expect("123,456,789") { outputPositiveLongGroupedString(123456789) }
+        expect("1,234,567,890") { outputPositiveLongGroupedString(1234567890) }
+        expect("12,345,678,901") { outputPositiveLongGroupedString(12345678901) }
+        expect("123,456,789,012") { outputPositiveLongGroupedString(123456789012) }
+        expect("1,234,567,890,123") { outputPositiveLongGroupedString(1234567890123) }
+        expect("12,345,678,901,234") { outputPositiveLongGroupedString(12345678901234) }
+        expect("123,456,789,012,345") { outputPositiveLongGroupedString(123456789012345) }
+        expect("1,234,567,890,123,456") { outputPositiveLongGroupedString(1234567890123456) }
+        expect("12,345,678,901,234,567") { outputPositiveLongGroupedString(12345678901234567) }
+        expect("123,456,789,012,345,678") { outputPositiveLongGroupedString(123456789012345678) }
+        expect("1,234,567,890,123,456,789") { outputPositiveLongGroupedString(1234567890123456789) }
+        expect("2 147 483 647") { outputPositiveLongGroupedString(Int.MAX_VALUE.toLong(), ' ') }
+        expect("9_223_372_036_854_775_807") { outputPositiveLongGroupedString(Long.MAX_VALUE, '_') }
+    }
+
+    private suspend fun outputPositiveLongGroupedString(n: Long, groupingChar: Char = ',') =
+        CoCapture().apply { outputPositiveLongGrouped(n, groupingChar) }.toString()
+
+    @Test fun `should convert int to hex correctly using lambda`() = runBlocking {
         expect("0") { coOutputIntHexString(0) }
         expect("1") { coOutputIntHexString(1) }
         expect("23") { coOutputIntHexString(0x23) }
@@ -328,25 +553,51 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should convert int to hex correctly in lower case`() = runBlocking {
-        expect("0") { coOutputIntHexStringLC(0) }
-        expect("1") { coOutputIntHexStringLC(1) }
-        expect("23") { coOutputIntHexStringLC(0x23) }
-        expect("456") { coOutputIntHexStringLC(0x456) }
-        expect("a789") { coOutputIntHexStringLC(0xA789) }
-        expect("8a1b1") { coOutputIntHexStringLC(0x8A1B1) }
-        expect("feeabc") { coOutputIntHexStringLC(0xFEEABC) }
-        expect("deadfeed") { coOutputIntHexStringLC(0xDEADFEED.toInt()) }
+    @Test fun `should convert int to hex correctly using extension function`() = runBlocking {
+        expect("0") { outputIntHexString(0) }
+        expect("1") { outputIntHexString(1) }
+        expect("23") { outputIntHexString(0x23) }
+        expect("456") { outputIntHexString(0x456) }
+        expect("A789") { outputIntHexString(0xA789) }
+        expect("8A1B1") { outputIntHexString(0x8A1B1) }
+        expect("FEEABC") { outputIntHexString(0xFEEABC) }
+        expect("DEADFEED") { outputIntHexString(0xDEADFEED.toInt()) }
     }
 
-    private suspend fun coOutputIntHexStringLC(n: Int): String {
+    private suspend fun outputIntHexString(n: Int) = CoCapture().apply { outputIntHex(n) }.toString()
+
+    @Test fun `should convert int to hex correctly in lower case using lambda`() = runBlocking {
+        expect("0") { coOutputIntHexLCString(0) }
+        expect("1") { coOutputIntHexLCString(1) }
+        expect("23") { coOutputIntHexLCString(0x23) }
+        expect("456") { coOutputIntHexLCString(0x456) }
+        expect("a789") { coOutputIntHexLCString(0xA789) }
+        expect("8a1b1") { coOutputIntHexLCString(0x8A1B1) }
+        expect("feeabc") { coOutputIntHexLCString(0xFEEABC) }
+        expect("deadfeed") { coOutputIntHexLCString(0xDEADFEED.toInt()) }
+    }
+
+    private suspend fun coOutputIntHexLCString(n: Int): String {
         val charArray = CharArray(16)
         var i = 0
         coOutputIntHexLC(n) { charArray[i++] = it }
         return String(charArray, 0, i)
     }
 
-    @Test fun `should convert long to hex correctly`() = runBlocking {
+    @Test fun `should convert int to hex correctly in lower case using extension function`() = runBlocking {
+        expect("0") { outputIntHexLCString(0) }
+        expect("1") { outputIntHexLCString(1) }
+        expect("23") { outputIntHexLCString(0x23) }
+        expect("456") { outputIntHexLCString(0x456) }
+        expect("a789") { outputIntHexLCString(0xA789) }
+        expect("8a1b1") { outputIntHexLCString(0x8A1B1) }
+        expect("feeabc") { outputIntHexLCString(0xFEEABC) }
+        expect("deadfeed") { outputIntHexLCString(0xDEADFEED.toInt()) }
+    }
+
+    private suspend fun outputIntHexLCString(n: Int) = CoCapture().apply { outputIntHexLC(n) }.toString()
+
+    @Test fun `should convert long to hex correctly using lambda`() = runBlocking {
         expect("0") { coOutputLongHexString(0) }
         expect("1") { coOutputLongHexString(1) }
         expect("23") { coOutputLongHexString(0x23) }
@@ -366,7 +617,22 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should convert long to hex correctly in lower case`() = runBlocking {
+    @Test fun `should convert long to hex correctly using extension function`() = runBlocking {
+        expect("0") { outputLongHexString(0) }
+        expect("1") { outputLongHexString(1) }
+        expect("23") { outputLongHexString(0x23) }
+        expect("456") { outputLongHexString(0x456) }
+        expect("A789") { outputLongHexString(0xA789) }
+        expect("8A1B1") { outputLongHexString(0x8A1B1) }
+        expect("FEEABC") { outputLongHexString(0xFEEABC) }
+        expect("DEADFEED") { outputLongHexString(0xDEADFEED) }
+        expect("123DEADFEED") { outputLongHexString(0x123DEADFEED) }
+        expect("8000000000000000") { outputLongHexString(Long.MIN_VALUE) }
+    }
+
+    private suspend fun outputLongHexString(n: Long) = CoCapture().apply { outputLongHex(n) }.toString()
+
+    @Test fun `should convert long to hex correctly in lower case using lambda`() = runBlocking {
         expect("0") { coOutputLongHexLCString(0) }
         expect("1") { coOutputLongHexLCString(1) }
         expect("23") { coOutputLongHexLCString(0x23) }
@@ -386,7 +652,22 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should output 8 digits hex correctly`() = runBlocking {
+    @Test fun `should convert long to hex correctly in lower case using extension function`() = runBlocking {
+        expect("0") { outputLongHexLCString(0) }
+        expect("1") { outputLongHexLCString(1) }
+        expect("23") { outputLongHexLCString(0x23) }
+        expect("456") { outputLongHexLCString(0x456) }
+        expect("a789") { outputLongHexLCString(0xA789) }
+        expect("8a1b1") { outputLongHexLCString(0x8A1B1) }
+        expect("feeabc") { outputLongHexLCString(0xFEEABC) }
+        expect("deadfeed") { outputLongHexLCString(0xDEADFEED) }
+        expect("123deadfeed") { outputLongHexLCString(0x123DEADFEED) }
+        expect("8000000000000000") { outputLongHexLCString(Long.MIN_VALUE) }
+    }
+
+    private suspend fun outputLongHexLCString(n: Long) = CoCapture().apply { outputLongHexLC(n) }.toString()
+
+    @Test fun `should output 8 digits hex correctly using lambda`() = runBlocking {
         expect("00000000") { coOutput8HexString(0) }
         expect("00000001") { coOutput8HexString(1) }
         expect("0000ABCD") { coOutput8HexString(0xABCD) }
@@ -403,7 +684,19 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should output 8 digits hex correctly in lower case`() = runBlocking {
+    @Test fun `should output 8 digits hex correctly using extension function`() = runBlocking {
+        expect("00000000") { output8HexString(0) }
+        expect("00000001") { output8HexString(1) }
+        expect("0000ABCD") { output8HexString(0xABCD) }
+        expect("0009ABCD") { output8HexString(0x9ABCD) }
+        expect("0089ABCD") { output8HexString(0x89ABCD) }
+        expect("0E89ABCD") { output8HexString(0xE89ABCD) }
+        expect("7E89ABCD") { output8HexString(0x7E89ABCD) }
+    }
+
+    private suspend fun output8HexString(n: Int) = CoCapture().apply { output8Hex(n) }.toString()
+
+    @Test fun `should output 8 digits hex correctly in lower case using lambda`() = runBlocking {
         expect("00000000") { coOutput8HexLCString(0) }
         expect("00000001") { coOutput8HexLCString(1) }
         expect("0000abcd") { coOutput8HexLCString(0xABCD) }
@@ -420,7 +713,19 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should output 4 digits hex correctly`() = runBlocking {
+    @Test fun `should output 8 digits hex correctly in lower case using extension function`() = runBlocking {
+        expect("00000000") { output8HexLCString(0) }
+        expect("00000001") { output8HexLCString(1) }
+        expect("0000abcd") { output8HexLCString(0xABCD) }
+        expect("0009abcd") { output8HexLCString(0x9ABCD) }
+        expect("0089abcd") { output8HexLCString(0x89ABCD) }
+        expect("0e89abcd") { output8HexLCString(0xE89ABCD) }
+        expect("fe89abcd") { output8HexLCString(0xFE89ABCD.toInt()) }
+    }
+
+    private suspend fun output8HexLCString(n: Int) = CoCapture().apply { output8HexLC(n) }.toString()
+
+    @Test fun `should output 4 digits hex correctly using lambda`() = runBlocking {
         expect("0000") { coOutput4HexString(0) }
         expect("0001") { coOutput4HexString(1) }
         expect("ABCD") { coOutput4HexString(0xABCD) }
@@ -433,7 +738,15 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should output 4 digits hex correctly in lower case`() = runBlocking {
+    @Test fun `should output 4 digits hex correctly using extension function`() = runBlocking {
+        expect("0000") { output4HexString(0) }
+        expect("0001") { output4HexString(1) }
+        expect("ABCD") { output4HexString(0xABCD) }
+    }
+
+    private suspend fun output4HexString(n: Int) = CoCapture().apply { output4Hex(n) }.toString()
+
+    @Test fun `should output 4 digits hex correctly in lower case using lambda`() = runBlocking {
         expect("0000") { coOutput4HexLCString(0) }
         expect("0001") { coOutput4HexLCString(1) }
         expect("abcd") { coOutput4HexLCString(0xABCD) }
@@ -446,7 +759,15 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should output 2 digits hex correctly`() = runBlocking {
+    @Test fun `should output 4 digits hex correctly in lower case`() = runBlocking {
+        expect("0000") { output4HexLCString(0) }
+        expect("0001") { output4HexLCString(1) }
+        expect("abcd") { output4HexLCString(0xABCD) }
+    }
+
+    private suspend fun output4HexLCString(n: Int) = CoCapture().apply { output4HexLC(n) }.toString()
+
+    @Test fun `should output 2 digits hex correctly using lambda`() = runBlocking {
         expect("00") { coOutput2HexString(0) }
         expect("01") { coOutput2HexString(1) }
         expect("AB") { coOutput2HexString(0xAB) }
@@ -459,7 +780,15 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should output 2 digits hex correctly in lower case`() = runBlocking {
+    @Test fun `should output 2 digits hex correctly using extension function`() = runBlocking {
+        expect("00") { output2HexString(0) }
+        expect("01") { output2HexString(1) }
+        expect("AB") { output2HexString(0xAB) }
+    }
+
+    private suspend fun output2HexString(n: Int) = CoCapture().apply { output2Hex(n) }.toString()
+
+    @Test fun `should output 2 digits hex correctly in lower case using lambda`() = runBlocking {
         expect("00") { coOutput2HexLCString(0) }
         expect("01") { coOutput2HexLCString(1) }
         expect("ab") { coOutput2HexLCString(0xAB) }
@@ -472,7 +801,15 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should output 1 digit hex correctly`() = runBlocking {
+    @Test fun `should output 2 digits hex correctly in lower case using extension function`() = runBlocking {
+        expect("00") { output2HexLCString(0) }
+        expect("01") { output2HexLCString(1) }
+        expect("ab") { output2HexLCString(0xAB) }
+    }
+
+    private suspend fun output2HexLCString(n: Int) = CoCapture().apply { output2HexLC(n) }.toString()
+
+    @Test fun `should output 1 digit hex correctly using lambda`() = runBlocking {
         expect("0") { coOutput1HexString(0) }
         expect("1") { coOutput1HexString(1) }
         expect("A") { coOutput1HexString(0xA) }
@@ -485,7 +822,15 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
-    @Test fun `should output 1 digit hex correctly in lower case`() = runBlocking {
+    @Test fun `should output 1 digit hex correctly using extension function`() = runBlocking {
+        expect("0") { output1HexString(0) }
+        expect("1") { output1HexString(1) }
+        expect("A") { output1HexString(0xA) }
+    }
+
+    private suspend fun output1HexString(n: Int) = CoCapture().apply { output1Hex(n) }.toString()
+
+    @Test fun `should output 1 digit hex correctly in lower case using lambda`() = runBlocking {
         expect("0") { coOutput1HexLCString(0) }
         expect("1") { coOutput1HexLCString(1) }
         expect("a") { coOutput1HexLCString(0xA) }
@@ -498,9 +843,30 @@ class CoIntOutputTest {
         return String(charArray, 0, i)
     }
 
+    @Test fun `should output 1 digit hex correctly in lower case using extension function`() = runBlocking {
+        expect("0") { output1HexLCString(0) }
+        expect("1") { output1HexLCString(1) }
+        expect("a") { output1HexLCString(0xA) }
+    }
+
+    private suspend fun output1HexLCString(n: Int) = CoCapture().apply { output1HexLC(n) }.toString()
+
     companion object {
         fun maxValue() = Long.MAX_VALUE // this and the following are contrivances to avoid compiler warnings
         fun nineteenDigits() = 1234567890123456789
+    }
+
+    class CoCapture(size: Int = 256) : CoOutput {
+
+        private val array = CharArray(size)
+        private var index = 0
+
+        override suspend fun invoke(ch: Char) {
+            array[index++] = ch
+        }
+
+        override fun toString() = String(array, 0, index)
+
     }
 
 }
