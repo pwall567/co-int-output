@@ -2,6 +2,14 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [2.3] - 2023-07-24
+### Changed
+- `pom.xml`: updated dependency version
+
+## [2.2] - 2023-07-23
+### Changed
+- `pom.xml`: updated Kotlin version to 1.8.22
+
 ## [2.1] - 2023-04-24
 ### Added
 - `CoOutputFlushable`: extension to `CoOutput` to allow `flush()`
