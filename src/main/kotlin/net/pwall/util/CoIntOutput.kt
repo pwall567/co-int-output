@@ -2,7 +2,7 @@
  * @(#) CoIntOutput.java
  *
  * co-int-output  Non-blocking integer output functions
- * Copyright (c) 2022 Peter Wall
+ * Copyright (c) 2022, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,8 @@
 
 package net.pwall.util
 
-import net.pwall.util.IntOutput.MIN_INTEGER_STRING
-import net.pwall.util.IntOutput.MIN_LONG_STRING
+import net.pwall.util.IntOutput.MIN_INTEGER_DIGITS
+import net.pwall.util.IntOutput.MIN_LONG_DIGITS
 import net.pwall.util.IntOutput.digits
 import net.pwall.util.IntOutput.digitsHex
 import net.pwall.util.IntOutput.digitsHexLC
@@ -52,14 +52,15 @@ object CoIntOutput {
      * Output an `Int` left-trimmed.
      */
     suspend fun CoOutput.outputInt(i: Int) {
-        when {
-            i >= 0 -> outputPositiveInt(i)
-            i == Int.MIN_VALUE -> output(MIN_INTEGER_STRING)
-            else -> {
-                output('-')
+        if (i < 0) {
+            output('-')
+            if (i == Int.MIN_VALUE)
+                output(MIN_INTEGER_DIGITS)
+            else
                 outputPositiveInt(-i)
-            }
         }
+        else
+            outputPositiveInt(i)
     }
 
     /**
@@ -101,6 +102,93 @@ object CoIntOutput {
     }
 
     /**
+     * Output an `Int` left-trimmed, using a scale parameter to indicate the number of decimal places.
+     *
+     * Negative scale values (indicating that decimal point is to the right of the last digit) are ignored.  It is left
+     * to the user to decide whether to output additional zeros following the number, or to add an exponent suffix.
+     */
+    suspend fun coOutputIntScaled(i: Int, scale: Int, separator: Char = '.', out: CoOutput) =
+            out.outputIntScaled(i, scale, separator)
+
+    /**
+     * Output an `Int` left-trimmed, using a scale parameter to indicate the number of decimal places.
+     *
+     * Negative scale values (indicating that decimal point is to the right of the last digit) are ignored.  It is left
+     * to the user to decide whether to output additional zeros following the number, or to add an exponent suffix.
+     */
+    suspend fun CoOutput.outputIntScaled(i: Int, scale: Int, separator: Char = '.') {
+        if (i < 0) {
+            output('-')
+            if (i == Int.MIN_VALUE)
+                outputStringScaled(MIN_INTEGER_DIGITS, scale, separator)
+            else
+                outputPositiveIntScaled(-i, scale, separator)
+        }
+        else
+            outputPositiveIntScaled(i, scale, separator)
+    }
+
+    /**
+     * Output a positive `Int` left-trimmed, using a scale parameter to indicate the number of decimal places.
+     *
+     * Negative scale values (indicating that decimal point is to the right of the last digit) are ignored.  It is left
+     * to the user to decide whether to output additional zeros following the number, or to add an exponent suffix.
+     */
+    suspend fun coOutputPositiveIntScaled(i: Int, scale: Int, separator: Char = '.', out: CoOutput) =
+            out.outputPositiveIntScaled(i, scale, separator)
+
+    suspend fun CoOutput.outputPositiveIntScaled(i: Int, scale: Int, separator: Char = '.') {
+        when {
+            scale > 2 -> {
+                val n = i / 100
+                outputPositiveIntScaled(n, scale - 2, separator)
+                output2Digits(i - n * 100)
+            }
+            scale == 2 -> {
+                val n = i / 100
+                outputPositiveInt(n)
+                output(separator)
+                output2Digits(i - n * 100)
+            }
+            scale == 1 -> {
+                val n = i / 10
+                outputPositiveInt(n)
+                output(separator)
+                output(digits[i - n * 10])
+            }
+            i >= 100 -> {
+                val n = i / 100
+                outputPositiveInt(n)
+                output2Digits(i - n * 100)
+            }
+            i >= 10 -> output2Digits(i)
+            else -> output(digits[i])
+        }
+    }
+
+    private suspend fun CoOutput.outputStringScaled(string: String, scale: Int, separator: Char) {
+        if (scale <= 0)
+            output(string)
+        else {
+            val length = string.length
+            if (scale >= length) {
+                output('0')
+                output(separator)
+                repeat(scale - length) { output('0') }
+                output(string)
+            }
+            else {
+                val insertionPoint = length - scale
+                for (i in 0 until length) {
+                    if (i == insertionPoint)
+                        output(separator)
+                    output(string[i])
+                }
+            }
+        }
+    }
+
+    /**
      * Output a `Long` left-trimmed.
      */
     suspend fun coOutputLong(n: Long, out: CoOutput) = out.outputLong(n)
@@ -109,14 +197,15 @@ object CoIntOutput {
      * Output a `Long` left-trimmed.
      */
     suspend fun CoOutput.outputLong(n: Long) {
-        when {
-            n >= 0 -> outputPositiveLong(n)
-            n == Long.MIN_VALUE -> output(MIN_LONG_STRING)
-            else -> {
-                output('-')
+        if (n < 0) {
+            output('-')
+            if (n == Long.MIN_VALUE)
+                output(MIN_LONG_DIGITS)
+            else
                 outputPositiveLong(-n)
-            }
         }
+        else
+            outputPositiveLong(n)
     }
 
     /**
@@ -157,6 +246,53 @@ object CoIntOutput {
         }
     }
 
+    suspend fun coOutputLongScaled(n: Long, scale: Int, separator: Char = '.', out: CoOutput) =
+        out.outputLongScaled(n, scale, separator)
+
+    suspend fun CoOutput.outputLongScaled(n: Long, scale: Int, separator: Char = '.') {
+        if (n < 0) {
+            output('-')
+            if (n == Long.MIN_VALUE)
+                outputStringScaled(MIN_LONG_DIGITS, scale, separator)
+            else
+                outputPositiveLongScaled(-n, scale, separator)
+        }
+        else
+            outputPositiveLongScaled(n, scale, separator)
+    }
+
+    suspend fun coOutputPositiveLongScaled(n: Long, scale: Int, separator: Char = '.', out: CoOutput) =
+        out.outputPositiveLongScaled(n, scale, separator)
+
+    suspend fun CoOutput.outputPositiveLongScaled(n: Long, scale: Int, separator: Char = '.') {
+        when {
+            scale > 2 -> {
+                val m = n / 100
+                outputPositiveLongScaled(m, scale - 2, separator)
+                output2Digits((n - m * 100).toInt())
+            }
+            scale == 2 -> {
+                val m = n / 100
+                outputPositiveLong(m)
+                output(separator)
+                output2Digits((n - m * 100).toInt())
+            }
+            scale == 1 -> {
+                val m = n / 10
+                outputPositiveLong(m)
+                output(separator)
+                output(digits[(n - m * 10).toInt()])
+            }
+            n >= 100 -> {
+                val m = n / 100
+                outputPositiveLong(m)
+                output2Digits((n - m * 100).toInt())
+            }
+            n >= 10 -> output2Digits(n.toInt())
+            else -> output(digits[n.toInt()])
+        }
+    }
+
     /**
      * Output an `Int` as two decimal digits.
      */
@@ -194,22 +330,22 @@ object CoIntOutput {
      * Output an `Int` left-trimmed with digits grouped in 3s, separated by a specified grouping character.
      */
     suspend fun CoOutput.outputIntGrouped(i: Int, groupingChar: Char = ',') {
-        when {
-            i >= 0 -> outputPositiveIntGrouped(i, groupingChar)
-            i == Int.MIN_VALUE -> {
-                output(MIN_INTEGER_STRING, 0, 2)
+        if (i < 0) {
+            output('-')
+            if (i == Int.MIN_VALUE) {
+                output(MIN_INTEGER_DIGITS[0])
                 output(groupingChar)
-                output(MIN_INTEGER_STRING, 2, 5)
+                output(MIN_INTEGER_DIGITS, 1, 4)
                 output(groupingChar)
-                output(MIN_INTEGER_STRING, 5, 8)
+                output(MIN_INTEGER_DIGITS, 4, 7)
                 output(groupingChar)
-                output(MIN_INTEGER_STRING, 8, 11)
+                output(MIN_INTEGER_DIGITS, 7, 10)
             }
-            else -> {
-                output('-')
+            else
                 outputPositiveIntGrouped(-i, groupingChar)
-            }
         }
+        else
+            outputPositiveIntGrouped(i, groupingChar)
     }
 
     /**
@@ -275,28 +411,28 @@ object CoIntOutput {
      * Output a `Long` left-trimmed with digits grouped in 3s, separated by a specified grouping character.
      */
     suspend fun CoOutput.outputLongGrouped(n: Long, groupingChar: Char = ',') {
-        when {
-            n >= 0 -> outputPositiveLongGrouped(n, groupingChar)
-            n == Long.MIN_VALUE -> {
-                output(MIN_LONG_STRING, 0, 2)
+        if (n < 0) {
+            output('-')
+            if (n == Long.MIN_VALUE) {
+                output(MIN_LONG_DIGITS[0])
                 output(groupingChar)
-                output(MIN_LONG_STRING, 2, 5)
+                output(MIN_LONG_DIGITS, 1, 4)
                 output(groupingChar)
-                output(MIN_LONG_STRING, 5, 8)
+                output(MIN_LONG_DIGITS, 4, 7)
                 output(groupingChar)
-                output(MIN_LONG_STRING, 8, 11)
+                output(MIN_LONG_DIGITS, 7, 10)
                 output(groupingChar)
-                output(MIN_LONG_STRING, 11, 14)
+                output(MIN_LONG_DIGITS, 10, 13)
                 output(groupingChar)
-                output(MIN_LONG_STRING, 14, 17)
+                output(MIN_LONG_DIGITS, 13, 16)
                 output(groupingChar)
-                output(MIN_LONG_STRING, 17, 20)
+                output(MIN_LONG_DIGITS, 16, 19)
             }
-            else -> {
-                output('-')
+            else
                 outputPositiveLongGrouped(-n, groupingChar)
-            }
         }
+        else
+            outputPositiveLongGrouped(n, groupingChar)
     }
 
     /**

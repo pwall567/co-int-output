@@ -2,7 +2,7 @@
  * @(#) CoIntOutputTest.java
  *
  * co-int-output  Non-blocking integer output functions
- * Copyright (c) 2022 Peter Wall
+ * Copyright (c) 2022, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,14 +43,18 @@ import net.pwall.util.CoIntOutput.coOutputInt
 import net.pwall.util.CoIntOutput.coOutputIntGrouped
 import net.pwall.util.CoIntOutput.coOutputIntHex
 import net.pwall.util.CoIntOutput.coOutputIntHexLC
+import net.pwall.util.CoIntOutput.coOutputIntScaled
 import net.pwall.util.CoIntOutput.coOutputLong
 import net.pwall.util.CoIntOutput.coOutputLongGrouped
 import net.pwall.util.CoIntOutput.coOutputLongHex
 import net.pwall.util.CoIntOutput.coOutputLongHexLC
+import net.pwall.util.CoIntOutput.coOutputLongScaled
 import net.pwall.util.CoIntOutput.coOutputPositiveInt
 import net.pwall.util.CoIntOutput.coOutputPositiveIntGrouped
+import net.pwall.util.CoIntOutput.coOutputPositiveIntScaled
 import net.pwall.util.CoIntOutput.coOutputPositiveLong
 import net.pwall.util.CoIntOutput.coOutputPositiveLongGrouped
+import net.pwall.util.CoIntOutput.coOutputPositiveLongScaled
 import net.pwall.util.CoIntOutput.coOutputUnsignedInt
 import net.pwall.util.CoIntOutput.coOutputUnsignedLong
 import net.pwall.util.CoIntOutput.output1Hex
@@ -67,14 +71,18 @@ import net.pwall.util.CoIntOutput.outputInt
 import net.pwall.util.CoIntOutput.outputIntGrouped
 import net.pwall.util.CoIntOutput.outputIntHex
 import net.pwall.util.CoIntOutput.outputIntHexLC
+import net.pwall.util.CoIntOutput.outputIntScaled
 import net.pwall.util.CoIntOutput.outputLong
 import net.pwall.util.CoIntOutput.outputLongGrouped
 import net.pwall.util.CoIntOutput.outputLongHex
 import net.pwall.util.CoIntOutput.outputLongHexLC
+import net.pwall.util.CoIntOutput.outputLongScaled
 import net.pwall.util.CoIntOutput.outputPositiveInt
 import net.pwall.util.CoIntOutput.outputPositiveIntGrouped
+import net.pwall.util.CoIntOutput.outputPositiveIntScaled
 import net.pwall.util.CoIntOutput.outputPositiveLong
 import net.pwall.util.CoIntOutput.outputPositiveLongGrouped
+import net.pwall.util.CoIntOutput.outputPositiveLongScaled
 import net.pwall.util.CoIntOutput.outputUnsignedInt
 import net.pwall.util.CoIntOutput.outputUnsignedLong
 
@@ -152,6 +160,102 @@ class CoIntOutputTest {
 
     private suspend fun outputUnsignedIntString(n: Int) = CoCapture().apply { outputUnsignedInt(n) }.toString()
 
+    @Test fun `should convert int with scaling using lambda`() = runBlocking {
+        expect("0") { coOutputIntScaledString(0, 0) }
+        expect("0.0") { coOutputIntScaledString(0, 1) }
+        expect("0.00") { coOutputIntScaledString(0, 2) }
+        expect("0.000") { coOutputIntScaledString(0, 3) }
+        expect("123456") { coOutputIntScaledString(123456, 0) }
+        expect("12345.6") { coOutputIntScaledString(123456, 1) }
+        expect("1234.56") { coOutputIntScaledString(123456, 2) }
+        expect("123.456") { coOutputIntScaledString(123456, 3) }
+        expect("0.123456") { coOutputIntScaledString(123456, 6) }
+        expect("0.0123456") { coOutputIntScaledString(123456, 7) }
+        expect("0.00123456") { coOutputIntScaledString(123456, 8) }
+        expect("-22334455") { coOutputIntScaledString(-22334455, 0) }
+        expect("-2233445.5") { coOutputIntScaledString(-22334455, 1) }
+        expect("-223344.55") { coOutputIntScaledString(-22334455, 2) }
+        expect("-22334.455") { coOutputIntScaledString(-22334455, 3) }
+        expect("2147483647") { coOutputIntScaledString(Int.MAX_VALUE, 0) }
+        expect("214748364.7") { coOutputIntScaledString(Int.MAX_VALUE, 1) }
+        expect("21474836.47") { coOutputIntScaledString(Int.MAX_VALUE, 2) }
+        expect("2147483.647") { coOutputIntScaledString(Int.MAX_VALUE, 3) }
+        expect("-2147483648") { coOutputIntScaledString(Int.MIN_VALUE, 0) }
+        expect("-214748364.8") { coOutputIntScaledString(Int.MIN_VALUE, 1) }
+        expect("-21474836.48") { coOutputIntScaledString(Int.MIN_VALUE, 2) }
+        expect("-2147483.648") { coOutputIntScaledString(Int.MIN_VALUE, 3) }
+        expect("-0.2147483648") { coOutputIntScaledString(Int.MIN_VALUE, 10) }
+        expect("-0.02147483648") { coOutputIntScaledString(Int.MIN_VALUE, 11) }
+        expect("-0.002147483648") { coOutputIntScaledString(Int.MIN_VALUE, 12) }
+    }
+
+    private suspend fun coOutputIntScaledString(n: Int, scale: Int): String {
+        val charArray = CharArray(16)
+        var i = 0
+        coOutputIntScaled(n, scale) { charArray[i++] = it }
+        return String(charArray, 0, i)
+    }
+
+    @Test fun `should convert int with scaling using extension function`() = runBlocking {
+        expect("0") { outputIntScaledString(0, 0) }
+        expect("0.0") { outputIntScaledString(0, 1) }
+        expect("0.00") { outputIntScaledString(0, 2) }
+        expect("0.000") { outputIntScaledString(0, 3) }
+        expect("123456") { outputIntScaledString(123456, 0) }
+        expect("12345.6") { outputIntScaledString(123456, 1) }
+        expect("1234.56") { outputIntScaledString(123456, 2) }
+        expect("123.456") { outputIntScaledString(123456, 3) }
+        expect("0.123456") { outputIntScaledString(123456, 6) }
+        expect("0.0123456") { outputIntScaledString(123456, 7) }
+        expect("0.00123456") { outputIntScaledString(123456, 8) }
+        expect("-22334455") { outputIntScaledString(-22334455, 0) }
+        expect("-2233445.5") { outputIntScaledString(-22334455, 1) }
+        expect("-223344.55") { outputIntScaledString(-22334455, 2) }
+        expect("-22334.455") { outputIntScaledString(-22334455, 3) }
+        expect("2147483647") { outputIntScaledString(Int.MAX_VALUE, 0) }
+        expect("214748364.7") { outputIntScaledString(Int.MAX_VALUE, 1) }
+        expect("21474836.47") { outputIntScaledString(Int.MAX_VALUE, 2) }
+        expect("2147483.647") { outputIntScaledString(Int.MAX_VALUE, 3) }
+        expect("-2147483648") { outputIntScaledString(Int.MIN_VALUE, 0) }
+        expect("-214748364.8") { outputIntScaledString(Int.MIN_VALUE, 1) }
+        expect("-21474836.48") { outputIntScaledString(Int.MIN_VALUE, 2) }
+        expect("-2147483.648") { outputIntScaledString(Int.MIN_VALUE, 3) }
+        expect("-0.2147483648") { outputIntScaledString(Int.MIN_VALUE, 10) }
+        expect("-0.02147483648") { outputIntScaledString(Int.MIN_VALUE, 11) }
+        expect("-0.002147483648") { outputIntScaledString(Int.MIN_VALUE, 12) }
+    }
+
+    private suspend fun outputIntScaledString(n: Int, scale: Int) =
+            CoCapture().apply { outputIntScaled(n, scale) }.toString()
+
+    @Test fun `should convert positive int with scaling using lambda`() = runBlocking {
+        expect("0") { coOutputPositiveIntScaledString(0, 0) }
+        expect("0.0") { coOutputPositiveIntScaledString(0, 1) }
+        expect("0.00") { coOutputPositiveIntScaledString(0, 2) }
+        expect("123456") { coOutputPositiveIntScaledString(123456, 0) }
+        expect("12345.6") { coOutputPositiveIntScaledString(123456, 1) }
+        expect("1234.56") { coOutputPositiveIntScaledString(123456, 2) }
+    }
+
+    private suspend fun coOutputPositiveIntScaledString(n: Int, scale: Int): String {
+        val charArray = CharArray(16)
+        var i = 0
+        coOutputPositiveIntScaled(n, scale) { charArray[i++] = it }
+        return String(charArray, 0, i)
+    }
+
+    @Test fun `should convert positive int with scaling using extension function`() = runBlocking {
+        expect("0") { outputPositiveIntScaledString(0, 0) }
+        expect("0.0") { outputPositiveIntScaledString(0, 1) }
+        expect("0.00") { outputPositiveIntScaledString(0, 2) }
+        expect("123456") { outputPositiveIntScaledString(123456, 0) }
+        expect("12345.6") { outputPositiveIntScaledString(123456, 1) }
+        expect("1234.56") { outputPositiveIntScaledString(123456, 2) }
+    }
+
+    private suspend fun outputPositiveIntScaledString(n: Int, scale: Int) =
+            CoCapture().apply { outputPositiveIntScaled(n, scale) }.toString()
+
     @Test fun `should convert long correctly using lambda`() = runBlocking {
         expect("0") { coOutputLongString(0) }
         expect("123456789012345678") { coOutputLongString(123456789012345678) }
@@ -226,6 +330,126 @@ class CoIntOutputTest {
     }
 
     private suspend fun outputUnsignedLongString(n: Long) = CoCapture().apply { outputUnsignedLong(n) }.toString()
+
+    @Test fun `should convert long with scaling using lambda`() = runBlocking {
+        expect("0") { coOutputLongScaledString(0, 0) }
+        expect("0.0") { coOutputLongScaledString(0, 1) }
+        expect("0.00") { coOutputLongScaledString(0, 2) }
+        expect("0.000") { coOutputLongScaledString(0, 3) }
+        expect("123456") { coOutputLongScaledString(123456, 0) }
+        expect("12345.6") { coOutputLongScaledString(123456, 1) }
+        expect("1234.56") { coOutputLongScaledString(123456, 2) }
+        expect("123.456") { coOutputLongScaledString(123456, 3) }
+        expect("0.123456") { coOutputLongScaledString(123456, 6) }
+        expect("0.0123456") { coOutputLongScaledString(123456, 7) }
+        expect("0.00123456") { coOutputLongScaledString(123456, 8) }
+        expect("-22334455") { coOutputLongScaledString(-22334455, 0) }
+        expect("-2233445.5") { coOutputLongScaledString(-22334455, 1) }
+        expect("-223344.55") { coOutputLongScaledString(-22334455, 2) }
+        expect("-22334.455") { coOutputLongScaledString(-22334455, 3) }
+        expect("123456789012345678") { coOutputLongScaledString(123456789012345678, 0) }
+        expect("12345678901234567.8") { coOutputLongScaledString(123456789012345678, 1) }
+        expect("1234567890123456.78") { coOutputLongScaledString(123456789012345678, 2) }
+        expect("123456789012345.678") { coOutputLongScaledString(123456789012345678, 3) }
+        expect("0.123456789012345678") { coOutputLongScaledString(123456789012345678, 18) }
+        expect("0.0123456789012345678") { coOutputLongScaledString(123456789012345678, 19) }
+        expect("0.00123456789012345678") { coOutputLongScaledString(123456789012345678, 20) }
+        expect("-2233445566778899") { coOutputLongScaledString(-2233445566778899, 0) }
+        expect("-223344556677889.9") { coOutputLongScaledString(-2233445566778899, 1) }
+        expect("-0.2233445566778899") { coOutputLongScaledString(-2233445566778899, 16) }
+        expect("-0.02233445566778899") { coOutputLongScaledString(-2233445566778899, 17) }
+        expect("9223372036854775807") { coOutputLongScaledString(Long.MAX_VALUE, 0) }
+        expect("922337203685477580.7") { coOutputLongScaledString(Long.MAX_VALUE, 1) }
+        expect("92233720368547758.07") { coOutputLongScaledString(Long.MAX_VALUE, 2) }
+        expect("9223372036854775.807") { coOutputLongScaledString(Long.MAX_VALUE, 3) }
+        expect("-9223372036854775808") { coOutputLongScaledString(Long.MIN_VALUE, 0) }
+        expect("-922337203685477580.8") { coOutputLongScaledString(Long.MIN_VALUE, 1) }
+        expect("-92233720368547758.08") { coOutputLongScaledString(Long.MIN_VALUE, 2) }
+        expect("-9223372036854775.808") { coOutputLongScaledString(Long.MIN_VALUE, 3) }
+        expect("-922337203.6854775808") { coOutputLongScaledString(Long.MIN_VALUE, 10) }
+        expect("-0.9223372036854775808") { coOutputLongScaledString(Long.MIN_VALUE, 19) }
+        expect("-0.09223372036854775808") { coOutputLongScaledString(Long.MIN_VALUE, 20) }
+        expect("-0.009223372036854775808") { coOutputLongScaledString(Long.MIN_VALUE, 21) }
+    }
+
+    private suspend fun coOutputLongScaledString(n: Long, scale: Int): String {
+        val charArray = CharArray(32)
+        var i = 0
+        coOutputLongScaled(n, scale) { charArray[i++] = it }
+        return String(charArray, 0, i)
+    }
+
+    @Test fun `should convert long with scaling using extension function`() = runBlocking {
+        expect("0") { outputLongScaledString(0, 0) }
+        expect("0.0") { outputLongScaledString(0, 1) }
+        expect("0.00") { outputLongScaledString(0, 2) }
+        expect("0.000") { outputLongScaledString(0, 3) }
+        expect("123456") { outputLongScaledString(123456, 0) }
+        expect("12345.6") { outputLongScaledString(123456, 1) }
+        expect("1234.56") { outputLongScaledString(123456, 2) }
+        expect("123.456") { outputLongScaledString(123456, 3) }
+        expect("0.123456") { outputLongScaledString(123456, 6) }
+        expect("0.0123456") { outputLongScaledString(123456, 7) }
+        expect("0.00123456") { outputLongScaledString(123456, 8) }
+        expect("-22334455") { outputLongScaledString(-22334455, 0) }
+        expect("-2233445.5") { outputLongScaledString(-22334455, 1) }
+        expect("-223344.55") { outputLongScaledString(-22334455, 2) }
+        expect("-22334.455") { outputLongScaledString(-22334455, 3) }
+        expect("123456789012345678") { outputLongScaledString(123456789012345678, 0) }
+        expect("12345678901234567.8") { outputLongScaledString(123456789012345678, 1) }
+        expect("1234567890123456.78") { outputLongScaledString(123456789012345678, 2) }
+        expect("123456789012345.678") { outputLongScaledString(123456789012345678, 3) }
+        expect("0.123456789012345678") { outputLongScaledString(123456789012345678, 18) }
+        expect("0.0123456789012345678") { outputLongScaledString(123456789012345678, 19) }
+        expect("0.00123456789012345678") { outputLongScaledString(123456789012345678, 20) }
+        expect("-2233445566778899") { outputLongScaledString(-2233445566778899, 0) }
+        expect("-223344556677889.9") { outputLongScaledString(-2233445566778899, 1) }
+        expect("-0.2233445566778899") { outputLongScaledString(-2233445566778899, 16) }
+        expect("-0.02233445566778899") { outputLongScaledString(-2233445566778899, 17) }
+        expect("9223372036854775807") { outputLongScaledString(Long.MAX_VALUE, 0) }
+        expect("922337203685477580.7") { outputLongScaledString(Long.MAX_VALUE, 1) }
+        expect("92233720368547758.07") { outputLongScaledString(Long.MAX_VALUE, 2) }
+        expect("9223372036854775.807") { outputLongScaledString(Long.MAX_VALUE, 3) }
+        expect("-9223372036854775808") { outputLongScaledString(Long.MIN_VALUE, 0) }
+        expect("-922337203685477580.8") { outputLongScaledString(Long.MIN_VALUE, 1) }
+        expect("-92233720368547758.08") { outputLongScaledString(Long.MIN_VALUE, 2) }
+        expect("-9223372036854775.808") { outputLongScaledString(Long.MIN_VALUE, 3) }
+        expect("-922337203.6854775808") { outputLongScaledString(Long.MIN_VALUE, 10) }
+        expect("-0.9223372036854775808") { outputLongScaledString(Long.MIN_VALUE, 19) }
+        expect("-0.09223372036854775808") { outputLongScaledString(Long.MIN_VALUE, 20) }
+        expect("-0.009223372036854775808") { outputLongScaledString(Long.MIN_VALUE, 21) }
+    }
+
+    private suspend fun outputLongScaledString(n: Long, scale: Int) =
+            CoCapture().apply { outputLongScaled(n, scale) }.toString()
+
+    @Test fun `should convert positive long with scaling using lambda`() = runBlocking {
+        expect("0") { coOutputPositiveLongScaledString(0, 0) }
+        expect("0.0") { coOutputPositiveLongScaledString(0, 1) }
+        expect("0.00") { coOutputPositiveLongScaledString(0, 2) }
+        expect("123456789012345678") { coOutputPositiveLongScaledString(123456789012345678, 0) }
+        expect("12345678901234567.8") { coOutputPositiveLongScaledString(123456789012345678, 1) }
+        expect("1234567890123456.78") { coOutputPositiveLongScaledString(123456789012345678, 2) }
+    }
+
+    private suspend fun coOutputPositiveLongScaledString(n: Long, scale: Int): String {
+        val charArray = CharArray(32)
+        var i = 0
+        coOutputPositiveLongScaled(n, scale) { charArray[i++] = it }
+        return String(charArray, 0, i)
+    }
+
+    @Test fun `should convert positive long with scaling using extension function`() = runBlocking {
+        expect("0") { outputPositiveLongScaledString(0, 0) }
+        expect("0.0") { outputPositiveLongScaledString(0, 1) }
+        expect("0.00") { outputPositiveLongScaledString(0, 2) }
+        expect("123456789012345678") { outputPositiveLongScaledString(123456789012345678, 0) }
+        expect("12345678901234567.8") { outputPositiveLongScaledString(123456789012345678, 1) }
+        expect("1234567890123456.78") { outputPositiveLongScaledString(123456789012345678, 2) }
+    }
+
+    private suspend fun outputPositiveLongScaledString(n: Long, scale: Int) =
+            CoCapture().apply { outputPositiveLongScaled(n, scale) }.toString()
 
     @Test fun `should output 2 digits correctly using lambda`() = runBlocking {
         expect("00") { coOutput2DigitsString(0) }

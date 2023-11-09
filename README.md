@@ -43,20 +43,24 @@ as its last parameter, and an extension function on `CoOutput`.
 
 ### Decimal
 
-| Function taking lambda        | Parameter | Output                                                          |
-|-------------------------------|-----------|-----------------------------------------------------------------|
-| `coOutputInt`                 | `int`     | left-trimmed                                                    |
-| `coOutputPositiveInt`         | `int`     | left-trimmed (value must be positive)                           |
-| `coOutputUnsignedInt`         | `int`     | left-trimmed (value is treated as unsigned)                     |
-| `coOutputLong`                | `long`    | left-trimmed                                                    |
-| `coOutputPositiveLong`        | `long`    | left-trimmed (value must be positive)                           |
-| `coOutputUnsignedLong`        | `long`    | left-trimmed (value is treated as unsigned)                     |
-| `coOutput2Digits`             | `int`     | 2 digits left filled with zeros                                 |
-| `coOutput3Digits`             | `int`     | 3 digits left filled with zeros                                 |
-| `coOutputIntGrouped`          | `int`     | left-trimmed, output in 3-digit groups                          |
-| `coOutputPositiveIntGrouped`  | `int`     | left-trimmed, output in 3-digit groups (value must be positive) |
-| `coOutputLongGrouped`         | `long`    | left-trimmed, output in 3-digit groups                          |
-| `coOutputPositiveLongGrouped` | `long`    | left-trimmed, output in 3-digit groups (value must be positive) |
+| Function taking lambda        | Parameter | Output                                                                             |
+|-------------------------------|-----------|------------------------------------------------------------------------------------|
+| `coOutputInt`                 | `int`     | left-trimmed                                                                       |
+| `coOutputPositiveInt`         | `int`     | left-trimmed (value must be positive)                                              |
+| `coOutputUnsignedInt`         | `int`     | left-trimmed (value is treated as unsigned)                                        |
+| `coOutputIntScaled`           | `int`     | left-trimmed with decimal separator as indicated by scale                          |
+| `coOutputPositiveIntScaled`   | `int`     | left-trimmed with decimal separator as indicated by scale (value must be positive) |
+| `coOutputLong`                | `long`    | left-trimmed                                                                       |
+| `coOutputPositiveLong`        | `long`    | left-trimmed (value must be positive)                                              |
+| `coOutputUnsignedLong`        | `long`    | left-trimmed (value is treated as unsigned)                                        |
+| `coOutputLongScaled`          | `long`    | left-trimmed with decimal separator as indicated by scale                          |
+| `coOutputPositiveLongScaled`  | `long`    | left-trimmed with decimal separator as indicated by scale (value must be positive) |
+| `coOutput2Digits`             | `int`     | 2 digits left filled with zeros                                                    |
+| `coOutput3Digits`             | `int`     | 3 digits left filled with zeros                                                    |
+| `coOutputIntGrouped`          | `int`     | left-trimmed, output in 3-digit groups                                             |
+| `coOutputPositiveIntGrouped`  | `int`     | left-trimmed, output in 3-digit groups (value must be positive)                    |
+| `coOutputLongGrouped`         | `long`    | left-trimmed, output in 3-digit groups                                             |
+| `coOutputPositiveLongGrouped` | `long`    | left-trimmed, output in 3-digit groups (value must be positive)                    |
 
 (the "grouped" forms output digits in blocks of three, separated by a nominated separator character)
 
@@ -117,25 +121,25 @@ lower-case)
 
 ## Dependency Specification
 
-The latest version of the library is 2.3, and it may be obtained from the Maven Central repository.
+The latest version of the library is 2.4, and it may be obtained from the Maven Central repository.
 
 ### Maven
 ```xml
     <dependency>
       <groupId>net.pwall.util</groupId>
       <artifactId>co-int-output</artifactId>
-      <version>2.3</version>
+      <version>2.4</version>
     </dependency>
 ```
 ### Gradle
 ```groovy
-    implementation 'net.pwall.util:co-int-output:2.3'
+    implementation 'net.pwall.util:co-int-output:2.4'
 ```
 ### Gradle (kts)
 ```kotlin
-    implementation("net.pwall.util:co-int-output:2.3")
+    implementation("net.pwall.util:co-int-output:2.4")
 ```
 
 Peter Wall
 
-2023-07-24
+2023-11-10

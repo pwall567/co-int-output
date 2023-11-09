@@ -2,6 +2,11 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [2.4] - 2023-11-10
+### Changed
+- `CoIntOutput`: added `outputIntScaled` _etc._
+- `pom.xml`: updated dependency version
+
 ## [2.3] - 2023-07-24
 ### Changed
 - `pom.xml`: updated dependency version
