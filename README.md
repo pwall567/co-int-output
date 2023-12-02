@@ -55,8 +55,12 @@ as its last parameter, and an extension function on `CoOutput`.
 | `coOutputUnsignedLong`        | `long`    | left-trimmed (value is treated as unsigned)                                        |
 | `coOutputLongScaled`          | `long`    | left-trimmed with decimal separator as indicated by scale                          |
 | `coOutputPositiveLongScaled`  | `long`    | left-trimmed with decimal separator as indicated by scale (value must be positive) |
+| `coOutput1Digit`              | `int`     | 1 digit                                                                            |
+| `coOutput1DigitSafe`          | `int`     | 1 digit (safe version; performs modulo on value)                                   |
 | `coOutput2Digits`             | `int`     | 2 digits left filled with zeros                                                    |
+| `coOutput2DigitsSafe`         | `int`     | 2 digits left filled with zeros (safe version; performs modulo on value)           |
 | `coOutput3Digits`             | `int`     | 3 digits left filled with zeros                                                    |
+| `coOutput3DigitsSafe`         | `int`     | 3 digits left filled with zeros (safe version; performs modulo on value)           |
 | `coOutputIntGrouped`          | `int`     | left-trimmed, output in 3-digit groups                                             |
 | `coOutputPositiveIntGrouped`  | `int`     | left-trimmed, output in 3-digit groups (value must be positive)                    |
 | `coOutputLongGrouped`         | `long`    | left-trimmed, output in 3-digit groups                                             |
@@ -64,20 +68,24 @@ as its last parameter, and an extension function on `CoOutput`.
 
 (the "grouped" forms output digits in blocks of three, separated by a nominated separator character)
 
-| Extension function                   | Parameter | Output                                                          |
-|--------------------------------------|-----------|-----------------------------------------------------------------|
-| `CoOutput.outputInt`                 | `int`     | left-trimmed                                                    |
-| `CoOutput.outputPositiveInt`         | `int`     | left-trimmed (value must be positive)                           |
-| `CoOutput.outputUnsignedInt`         | `int`     | left-trimmed (value is treated as unsigned)                     |
-| `CoOutput.outputLong`                | `long`    | left-trimmed                                                    |
-| `CoOutput.outputPositiveLong`        | `long`    | left-trimmed (value must be positive)                           |
-| `CoOutput.outputUnsignedLong`        | `long`    | left-trimmed (value is treated as unsigned)                     |
-| `CoOutput.output2Digits`             | `int`     | 2 digits left filled with zeros                                 |
-| `CoOutput.output3Digits`             | `int`     | 3 digits left filled with zeros                                 |
-| `CoOutput.outputIntGrouped`          | `int`     | left-trimmed, output in 3-digit groups                          |
-| `CoOutput.outputPositiveIntGrouped`  | `int`     | left-trimmed, output in 3-digit groups (value must be positive) |
-| `CoOutput.outputLongGrouped`         | `long`    | left-trimmed, output in 3-digit groups                          |
-| `CoOutput.outputPositiveLongGrouped` | `long`    | left-trimmed, output in 3-digit groups (value must be positive) |
+| Extension function                   | Parameter | Output                                                                   |
+|--------------------------------------|-----------|--------------------------------------------------------------------------|
+| `CoOutput.outputInt`                 | `int`     | left-trimmed                                                             |
+| `CoOutput.outputPositiveInt`         | `int`     | left-trimmed (value must be positive)                                    |
+| `CoOutput.outputUnsignedInt`         | `int`     | left-trimmed (value is treated as unsigned)                              |
+| `CoOutput.outputLong`                | `long`    | left-trimmed                                                             |
+| `CoOutput.outputPositiveLong`        | `long`    | left-trimmed (value must be positive)                                    |
+| `CoOutput.outputUnsignedLong`        | `long`    | left-trimmed (value is treated as unsigned)                              |
+| `CoOutput.output1Digit`              | `int`     | 1 digit                                                                  |
+| `CoOutput.output1DigitSafe`          | `int`     | 1 digit (safe version; performs modulo on value)                         |
+| `CoOutput.output2Digits`             | `int`     | 2 digits left filled with zeros                                          |
+| `CoOutput.output2DigitsSafe`         | `int`     | 2 digits left filled with zeros (safe version; performs modulo on value) |
+| `CoOutput.output3Digits`             | `int`     | 3 digits left filled with zeros                                          |
+| `CoOutput.output3DigitsSafe`         | `int`     | 3 digits left filled with zeros (safe version; performs modulo on value) |
+| `CoOutput.outputIntGrouped`          | `int`     | left-trimmed, output in 3-digit groups                                   |
+| `CoOutput.outputPositiveIntGrouped`  | `int`     | left-trimmed, output in 3-digit groups (value must be positive)          |
+| `CoOutput.outputLongGrouped`         | `long`    | left-trimmed, output in 3-digit groups                                   |
+| `CoOutput.outputPositiveLongGrouped` | `long`    | left-trimmed, output in 3-digit groups (value must be positive)          |
 
 (the "grouped" forms output digits in blocks of three, separated by a nominated separator character)
 
@@ -121,25 +129,25 @@ lower-case)
 
 ## Dependency Specification
 
-The latest version of the library is 2.4, and it may be obtained from the Maven Central repository.
+The latest version of the library is 2.5, and it may be obtained from the Maven Central repository.
 
 ### Maven
 ```xml
     <dependency>
       <groupId>net.pwall.util</groupId>
       <artifactId>co-int-output</artifactId>
-      <version>2.4</version>
+      <version>2.5</version>
     </dependency>
 ```
 ### Gradle
 ```groovy
-    implementation 'net.pwall.util:co-int-output:2.4'
+    implementation 'net.pwall.util:co-int-output:2.5'
 ```
 ### Gradle (kts)
 ```kotlin
-    implementation("net.pwall.util:co-int-output:2.4")
+    implementation("net.pwall.util:co-int-output:2.5")
 ```
 
 Peter Wall
 
-2023-11-10
+2023-12-02

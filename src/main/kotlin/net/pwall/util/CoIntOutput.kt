@@ -31,6 +31,7 @@ import net.pwall.util.IntOutput.digits
 import net.pwall.util.IntOutput.digitsHex
 import net.pwall.util.IntOutput.digitsHexLC
 import net.pwall.util.IntOutput.tensDigits
+import kotlin.math.abs
 
 /**
  * Non-blocking functions used in the conversion of integer values to string representations.  The functions all output
@@ -294,12 +295,44 @@ object CoIntOutput {
     }
 
     /**
-     * Output an `Int` as two decimal digits.
+     * Output an `Int` as a single decimal digit.  Note that there is no range check on the input value; to append the
+     * least significant digit in cases where the value is not guaranteed to be in the range 0..9, use
+     * [#coOutput1DigitSafe].
+     */
+    suspend fun coOutput1Digit(i: Int, out: CoOutput) = out.output1Digit(i)
+
+    /**
+     * Output an `Int` as a single decimal digit.  Note that there is no range check on the input value; to append the
+     * least significant digit in cases where the value is not guaranteed to be in the range 0..9, use
+     * [#output1DigitSafe].
+     */
+    suspend fun CoOutput.output1Digit(i: Int) {
+        output((i + '0'.code).toChar())
+    }
+
+    /**
+     * Output the least significant decimal digit of an `Int`.
+     */
+    suspend fun coOutput1DigitSafe(i: Int, out: CoOutput) = out.output1DigitSafe(i)
+
+    /**
+     * Output the least significant decimal digit of an `Int`.
+     */
+    suspend fun CoOutput.output1DigitSafe(i: Int) {
+        output(if (i == Int.MIN_VALUE) '8' else ((abs(i) % 10) + '0'.code).toChar()) // 8 is last digit of MIN_VALUE
+    }
+
+    /**
+     * Output an `Int` as two decimal digits.  Note that there is no range check on the input value; to append the
+     * least significant two digits in cases where the value is not guaranteed to be in the range 00..99, use
+     * [#coOutput2DigitsSafe].
      */
     suspend fun coOutput2Digits(i: Int, out: CoOutput) = out.output2Digits(i)
 
     /**
-     * Output an `Int` as two decimal digits.
+     * Output an `Int` as two decimal digits.  Note that there is no range check on the input value; to append the
+     * least significant two digits in cases where the value is not guaranteed to be in the range 00..99, use
+     * [#output2DigitsSafe].
      */
     suspend fun CoOutput.output2Digits(i: Int) {
         output(tensDigits[i])
@@ -307,17 +340,50 @@ object CoIntOutput {
     }
 
     /**
-     * Output an `Int` as three decimal digits.
+     * Output the least significant two decimal digits of an `Int`.
+     */
+    suspend fun coOutput2DigitsSafe(i: Int, out: CoOutput) = out.output2DigitsSafe(i)
+
+    /**
+     * Output the least significant two decimal digits of an `Int`.
+     */
+    suspend fun CoOutput.output2DigitsSafe(i: Int) {
+        val n = if (i == Int.MIN_VALUE) 48 else abs(i) % 100 // 48 is last two digits of MIN_VALUE
+        output(tensDigits[n])
+        output(digits[n])
+    }
+
+    /**
+     * Output an `Int` as three decimal digits.  Note that there is no range check on the input value; to append the
+     * least significant three digits in cases where the value is not guaranteed to be in the range 000..999, use
+     * [#coOutput3DigitsSafe].
      */
     suspend fun coOutput3Digits(i: Int, out: CoOutput) = out.output3Digits(i)
 
     /**
-     * Output an `Int` as three decimal digits.
+     * Output an `Int` as three decimal digits.  Note that there is no range check on the input value; to append the
+     * least significant three digits in cases where the value is not guaranteed to be in the range 000..999, use
+     * [#output3DigitsSafe].
      */
     suspend fun CoOutput.output3Digits(i: Int) {
         val n = i / 100
         output(digits[n])
         output2Digits(i - n * 100)
+    }
+
+    /**
+     * Output the least significant three decimal digits of an `Int`.
+     */
+    suspend fun coOutput3DigitsSafe(i: Int, out: CoOutput) = out.output3DigitsSafe(i)
+
+    /**
+     * Output the least significant three decimal digits of an `Int`.
+     */
+    suspend fun CoOutput.output3DigitsSafe(i: Int) {
+        val n = if (i == Int.MIN_VALUE) 648 else abs(i) % 1000 // 648 is last three digits of MIN_VALUE
+        val m = n / 100
+        output(digits[m])
+        output2Digits(n - m * 100)
     }
 
     /**

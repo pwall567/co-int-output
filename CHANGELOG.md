@@ -2,6 +2,13 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [2.5] - 2023-12-02
+### Changed
+- `CoIntOutput`: added `output1Digit` and `coOutput1Digit`
+- `CoIntOutput`: added "Safe" versions of `output1Digit`, `coOutput1Digit`, `output2Digits`, `coOutput2Digits`,
+  `output3Digits` and `coOutput3Digits`
+- `pom.xml`: updated dependency version
+
 ## [2.4] - 2023-11-10
 ### Changed
 - `CoIntOutput`: added `outputIntScaled` _etc._

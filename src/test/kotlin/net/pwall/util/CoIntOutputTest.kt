@@ -29,12 +29,16 @@ import kotlin.test.Test
 import kotlin.test.expect
 import kotlinx.coroutines.runBlocking
 
+import net.pwall.util.CoIntOutput.coOutput1Digit
+import net.pwall.util.CoIntOutput.coOutput1DigitSafe
 import net.pwall.util.CoIntOutput.coOutput1Hex
 import net.pwall.util.CoIntOutput.coOutput1HexLC
 import net.pwall.util.CoIntOutput.coOutput2Digits
+import net.pwall.util.CoIntOutput.coOutput2DigitsSafe
 import net.pwall.util.CoIntOutput.coOutput2Hex
 import net.pwall.util.CoIntOutput.coOutput2HexLC
 import net.pwall.util.CoIntOutput.coOutput3Digits
+import net.pwall.util.CoIntOutput.coOutput3DigitsSafe
 import net.pwall.util.CoIntOutput.coOutput4Hex
 import net.pwall.util.CoIntOutput.coOutput4HexLC
 import net.pwall.util.CoIntOutput.coOutput8Hex
@@ -57,12 +61,16 @@ import net.pwall.util.CoIntOutput.coOutputPositiveLongGrouped
 import net.pwall.util.CoIntOutput.coOutputPositiveLongScaled
 import net.pwall.util.CoIntOutput.coOutputUnsignedInt
 import net.pwall.util.CoIntOutput.coOutputUnsignedLong
+import net.pwall.util.CoIntOutput.output1Digit
+import net.pwall.util.CoIntOutput.output1DigitSafe
 import net.pwall.util.CoIntOutput.output1Hex
 import net.pwall.util.CoIntOutput.output1HexLC
 import net.pwall.util.CoIntOutput.output2Digits
+import net.pwall.util.CoIntOutput.output2DigitsSafe
 import net.pwall.util.CoIntOutput.output2Hex
 import net.pwall.util.CoIntOutput.output2HexLC
 import net.pwall.util.CoIntOutput.output3Digits
+import net.pwall.util.CoIntOutput.output3DigitsSafe
 import net.pwall.util.CoIntOutput.output4Hex
 import net.pwall.util.CoIntOutput.output4HexLC
 import net.pwall.util.CoIntOutput.output8Hex
@@ -451,6 +459,48 @@ class CoIntOutputTest {
     private suspend fun outputPositiveLongScaledString(n: Long, scale: Int) =
             CoCapture().apply { outputPositiveLongScaled(n, scale) }.toString()
 
+    @Test fun `should output 1 digit correctly using lambda`() = runBlocking {
+        expect("0") { coOutput1DigitString(0) }
+        expect("1") { coOutput1DigitString(1) }
+        expect("9") { coOutput1DigitString(9) }
+    }
+
+    private suspend fun coOutput1DigitString(n: Int): String {
+        val charArray = CharArray(4)
+        var i = 0
+        coOutput1Digit(n) { charArray[i++] = it }
+        return String(charArray, 0, i)
+    }
+
+    @Test fun `should output 1 digit correctly using extension function`() = runBlocking {
+        expect("0") { output1DigitString(0) }
+        expect("1") { output1DigitString(1) }
+        expect("9") { output1DigitString(9) }
+    }
+
+    private suspend fun output1DigitString(n: Int) = CoCapture().apply { output1Digit(n) }.toString()
+
+    @Test fun `should output 1 digit safely using lambda`() = runBlocking {
+        expect("0") { coOutput1DigitSafeString(20) }
+        expect("1") { coOutput1DigitSafeString(-61) }
+        expect("9") { coOutput1DigitSafeString(999999) }
+    }
+
+    private suspend fun coOutput1DigitSafeString(n: Int): String {
+        val charArray = CharArray(4)
+        var i = 0
+        coOutput1DigitSafe(n) { charArray[i++] = it }
+        return String(charArray, 0, i)
+    }
+
+    @Test fun `should output 1 digit safely using extension function`() = runBlocking {
+        expect("0") { output1DigitSafeString(20) }
+        expect("1") { output1DigitSafeString(-61) }
+        expect("9") { output1DigitSafeString(999999) }
+    }
+
+    private suspend fun output1DigitSafeString(n: Int) = CoCapture().apply { output1DigitSafe(n) }.toString()
+
     @Test fun `should output 2 digits correctly using lambda`() = runBlocking {
         expect("00") { coOutput2DigitsString(0) }
         expect("01") { coOutput2DigitsString(1) }
@@ -471,6 +521,27 @@ class CoIntOutputTest {
     }
 
     private suspend fun output2DigitsString(n: Int) = CoCapture().apply { output2Digits(n) }.toString()
+
+    @Test fun `should output 2 digits safely using lambda`() = runBlocking {
+        expect("00") { coOutput2DigitsSafeString(10000) }
+        expect("01") { coOutput2DigitsSafeString(-501) }
+        expect("21") { coOutput2DigitsSafeString(7654321) }
+    }
+
+    private suspend fun coOutput2DigitsSafeString(n: Int): String {
+        val charArray = CharArray(4)
+        var i = 0
+        coOutput2DigitsSafe(n) { charArray[i++] = it }
+        return String(charArray, 0, i)
+    }
+
+    @Test fun `should output 2 digits safely using extension function`() = runBlocking {
+        expect("00") { output2DigitsSafeString(10000) }
+        expect("01") { output2DigitsSafeString(-501) }
+        expect("21") { output2DigitsSafeString(7654321) }
+    }
+
+    private suspend fun output2DigitsSafeString(n: Int) = CoCapture().apply { output2DigitsSafe(n) }.toString()
 
     @Test fun `should output 3 digits correctly using lambda`() = runBlocking {
         expect("000") { coOutput3DigitsString(0) }
@@ -494,6 +565,29 @@ class CoIntOutputTest {
     }
 
     private suspend fun output3DigitsString(n: Int) = CoCapture().apply { output3Digits(n) }.toString()
+
+    @Test fun `should output 3 digits safely using lambda`() = runBlocking {
+        expect("000") { coOutput3DigitsSafeString(2000) }
+        expect("001") { coOutput3DigitsSafeString(-15001) }
+        expect("021") { coOutput3DigitsSafeString(66021) }
+        expect("321") { coOutput3DigitsSafeString(987654321) }
+    }
+
+    private suspend fun coOutput3DigitsSafeString(n: Int): String {
+        val charArray = CharArray(4)
+        var i = 0
+        coOutput3DigitsSafe(n) { charArray[i++] = it }
+        return String(charArray, 0, i)
+    }
+
+    @Test fun `should output 3 digits safely using extension function`() = runBlocking {
+        expect("000") { output3DigitsSafeString(2000) }
+        expect("001") { output3DigitsSafeString(-15001) }
+        expect("021") { output3DigitsSafeString(66021) }
+        expect("321") { output3DigitsSafeString(987654321) }
+    }
+
+    private suspend fun output3DigitsSafeString(n: Int) = CoCapture().apply { output3DigitsSafe(n) }.toString()
 
     @Test fun `should output integer with grouping using lambda`() = runBlocking {
         expect("0") { coOutputIntGroupedString(0) }
