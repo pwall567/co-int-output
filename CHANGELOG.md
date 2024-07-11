@@ -2,6 +2,14 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [2.6] - 2024-07-11
+### Added
+- `build.yml`, `deploy.yml`: converted project to GitHub Actions
+### Changed
+- `pom.xml`: updated Kotlin version to 1.9.24, updated dependency version
+### Removed
+- `.travis.yml`
+
 ## [2.5] - 2023-12-02
 ### Changed
 - `CoIntOutput`: added `output1Digit` and `coOutput1Digit`

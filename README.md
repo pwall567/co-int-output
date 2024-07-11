@@ -1,8 +1,8 @@
 # co-int-output
 
-[![Build Status](https://travis-ci.com/pwall567/co-int-output.svg?branch=main)](https://app.travis-ci.com/github/pwall567/co-int-output)
+[![Build Status](https://github.com/pwall567/co-int-output/actions/workflows/build.yml/badge.svg)](https://github.com/pwall567/co-int-output/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Kotlin](https://img.shields.io/static/v1?label=Kotlin&message=v1.8.22&color=7f52ff&logo=kotlin&logoColor=7f52ff)](https://github.com/JetBrains/kotlin/releases/tag/v1.8.22)
+[![Kotlin](https://img.shields.io/static/v1?label=Kotlin&message=v1.9.24&color=7f52ff&logo=kotlin&logoColor=7f52ff)](https://github.com/JetBrains/kotlin/releases/tag/v1.9.24)
 [![Maven Central](https://img.shields.io/maven-central/v/net.pwall.util/co-int-output?label=Maven%20Central)](https://search.maven.org/search?q=g:%22net.pwall.util%22%20AND%20a:%22co-int-output%22)
 
 Non-blocking integer output functions
@@ -87,7 +87,7 @@ as its last parameter, and an extension function on `CoOutput`.
 | `CoOutput.outputLongGrouped`         | `long`    | left-trimmed, output in 3-digit groups                                   |
 | `CoOutput.outputPositiveLongGrouped` | `long`    | left-trimmed, output in 3-digit groups (value must be positive)          |
 
-(the "grouped" forms output digits in blocks of three, separated by a nominated separator character)
+(the &ldquo;grouped&rdquo; forms output digits in blocks of three, separated by a nominated separator character)
 
 ### Hexadecimal
 
@@ -129,25 +129,25 @@ lower-case)
 
 ## Dependency Specification
 
-The latest version of the library is 2.5, and it may be obtained from the Maven Central repository.
+The latest version of the library is 2.6, and it may be obtained from the Maven Central repository.
 
 ### Maven
 ```xml
     <dependency>
       <groupId>net.pwall.util</groupId>
       <artifactId>co-int-output</artifactId>
-      <version>2.5</version>
+      <version>2.6</version>
     </dependency>
 ```
 ### Gradle
 ```groovy
-    implementation 'net.pwall.util:co-int-output:2.5'
+    implementation 'net.pwall.util:co-int-output:2.6'
 ```
 ### Gradle (kts)
 ```kotlin
-    implementation("net.pwall.util:co-int-output:2.5")
+    implementation("net.pwall.util:co-int-output:2.6")
 ```
 
 Peter Wall
 
-2023-12-02
+2024-07-11
