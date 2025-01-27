@@ -23,15 +23,16 @@
  * SOFTWARE.
  */
 
-package net.pwall.util
+package io.kstuff.util
 
-import net.pwall.util.IntOutput.MIN_INTEGER_DIGITS
-import net.pwall.util.IntOutput.MIN_LONG_DIGITS
-import net.pwall.util.IntOutput.digits
-import net.pwall.util.IntOutput.digitsHex
-import net.pwall.util.IntOutput.digitsHexLC
-import net.pwall.util.IntOutput.tensDigits
 import kotlin.math.abs
+
+import io.jstuff.util.IntOutput.MIN_INTEGER_DIGITS
+import io.jstuff.util.IntOutput.MIN_LONG_DIGITS
+import io.jstuff.util.IntOutput.digits
+import io.jstuff.util.IntOutput.digitsHex
+import io.jstuff.util.IntOutput.digitsHexLC
+import io.jstuff.util.IntOutput.tensDigits
 
 /**
  * Non-blocking functions used in the conversion of integer values to string representations.  The functions all output

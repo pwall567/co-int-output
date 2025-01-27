@@ -1,8 +1,8 @@
 /*
- * @(#) CoOutput.java
+ * @(#) CoOutputFlushableTest.java
  *
  * co-int-output  Non-blocking integer output functions
- * Copyright (c) 2022 Peter Wall
+ * Copyright (c) 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,27 +23,40 @@
  * SOFTWARE.
  */
 
-package net.pwall.util
+package io.kstuff.util
 
-/**
- * A non-blocking function to output a single character.
- */
-typealias CoOutput = suspend (Char) -> Unit
+import kotlinx.coroutines.runBlocking
+import kotlin.test.Test
 
-/**
- * Output the nominated section of a [CharSequence].
- */
-suspend fun CoOutput.output(cs: CharSequence, start: Int, end: Int) {
-    for (i in start until end)
-        this(cs[i])
+import io.kstuff.test.shouldBe
+
+import io.kstuff.util.CoIntOutput.outputInt
+
+class CoOutputFlushableTest {
+
+    @Test fun `should flush output`() = runBlocking {
+        val flushable = CoFlushableCapture()
+        flushable.outputInt(123)
+        flushable.toString() shouldBe "123"
+        flushable.flush()
+        flushable.toString() shouldBe "123\uFFFF"
+    }
+
+    class CoFlushableCapture(size: Int = 256) : CoOutputFlushable() {
+
+        private val array = CharArray(size)
+        private var index = 0
+
+        override suspend fun invoke(ch: Char) {
+            array[index++] = ch
+        }
+
+        override suspend fun flush() {
+            array[index++] = '\uFFFF'
+        }
+
+        override fun toString() = String(array, 0, index)
+
+    }
+
 }
-
-/**
- * Output a [CharSequence].
- */
-suspend fun CoOutput.output(cs: CharSequence) = output(cs, 0, cs.length)
-
-/**
- * Output a character.
- */
-suspend fun CoOutput.output(ch: Char) = this(ch)

@@ -3,18 +3,17 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>net.pwall.util</groupId>
   <artifactId>co-int-output</artifactId>
-  <version>2.7</version>
+  <version>3.0</version>
   <name>Non-blocking integer output functions</name>
   <description>Non-blocking versions of integer output functions</description>
   <packaging>jar</packaging>
   <url>https://github.com/pwall567/co-int-output</url>
 
   <parent>
-    <groupId>net.pwall.maven</groupId>
-    <artifactId>maven-kotlin</artifactId>
-    <version>8.0</version>
+    <groupId>io.kstuff</groupId>
+    <artifactId>kstuff-maven</artifactId>
+    <version>2.0</version>
   </parent>
 
   <properties>
@@ -59,9 +58,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>net.pwall.util</groupId>
+      <groupId>io.jstuff</groupId>
       <artifactId>int-output</artifactId>
-      <version>2.1</version>
+      <version>3.0</version>
     </dependency>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
@@ -71,6 +70,7 @@
       <groupId>io.kstuff</groupId>
       <artifactId>should-test</artifactId>
       <version>4.4</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>

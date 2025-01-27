@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/pwall567/co-int-output/actions/workflows/build.yml/badge.svg)](https://github.com/pwall567/co-int-output/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Kotlin](https://img.shields.io/static/v1?label=Kotlin&message=v2.0.21&color=7f52ff&logo=kotlin&logoColor=7f52ff)](https://github.com/JetBrains/kotlin/releases/tag/v2.0.21)
-[![Maven Central](https://img.shields.io/maven-central/v/net.pwall.util/co-int-output?label=Maven%20Central)](https://search.maven.org/search?q=g:%22net.pwall.util%22%20AND%20a:%22co-int-output%22)
+[![Maven Central](https://img.shields.io/maven-central/v/io.kstuff/co-int-output?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.kstuff%22%20AND%20a:%22co-int-output%22)
 
 Non-blocking integer output functions
 
@@ -129,25 +129,25 @@ lower-case)
 
 ## Dependency Specification
 
-The latest version of the library is 2.7, and it may be obtained from the Maven Central repository.
+The latest version of the library is 3.0, and it may be obtained from the Maven Central repository.
 
 ### Maven
 ```xml
     <dependency>
-      <groupId>net.pwall.util</groupId>
+      <groupId>io.kstuff</groupId>
       <artifactId>co-int-output</artifactId>
-      <version>2.7</version>
+      <version>3.0</version>
     </dependency>
 ```
 ### Gradle
 ```groovy
-    implementation 'net.pwall.util:co-int-output:2.7'
+    implementation 'io.kstuff:co-int-output:3.0'
 ```
 ### Gradle (kts)
 ```kotlin
-    implementation("net.pwall.util:co-int-output:2.7")
+    implementation("io.kstuff:co-int-output:3.0")
 ```
 
 Peter Wall
 
-2025-01-26
+2025-01-28

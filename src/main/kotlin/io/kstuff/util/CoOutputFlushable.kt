@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package net.pwall.util
+package io.kstuff.util
 
 /**
  * An extension to the `CoOutput` allowing `flush` operations.

@@ -4,6 +4,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ## [Unreleased]
 ### Changed
+- `pom.xml`: moved to `io.kstuff` (package amd Maven group)
 - tests: converted to `should-test` library
 
 ## [2.7] - 2025-01-25
