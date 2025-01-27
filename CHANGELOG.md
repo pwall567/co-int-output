@@ -2,6 +2,10 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [Unreleased]
+### Changed
+- tests: converted to `should-test` library
+
 ## [2.7] - 2025-01-25
 ### Changed
 - `pom.xml`: updated Kotlin version to 2.0.21, updated dependency version
